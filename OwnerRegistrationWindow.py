@@ -7,6 +7,9 @@ LABEL_PADDING = 2.4
 # The options for the property type drop down.
 PROP_TYPES = ["Farm", "Orchard", "Garden"]
 
+# The values for "Public?" or "Commercial?".
+PUB_COMM_VALUES = ["Yes", "No"]
+
 
 class OwnerRegistrationWindow:
     def __init__(self, master):
@@ -128,16 +131,7 @@ class OwnerRegistrationWindow:
                                               self.prop_type_var,
                                               *PROP_TYPES)
         self.prop_type_drop_down.pack(side=LEFT)
-
-        self.animal_label = Label(self.prop_animal_crop_container,
-                                  text="Animal*:",
-                                  font="Times 16")
-        self.animal_label.pack(side=LEFT)
-        self.animal_var = StringVar(master)
-        self.animal_drop_down = OptionMenu(self.prop_animal_crop_container,
-                                           self.animal_var,
-                                           *PROP_TYPES)
-        self.animal_drop_down.pack(side=LEFT)
+        self.prop_type_drop_down.bind("<Leave>", self.crop_changed_event_handler)
 
         self.crop_label = Label(self.prop_animal_crop_container,
                                   text="Crop*:",
@@ -149,6 +143,16 @@ class OwnerRegistrationWindow:
                                          *PROP_TYPES)
         self.crop_drop_down.pack(side=LEFT)
 
+        self.animal_label = Label(self.prop_animal_crop_container,
+                                  text="Animal*:",
+                                  font="Times 16")
+        self.animal_label.pack(side=LEFT)
+        self.animal_var = StringVar(master)
+        self.animal_drop_down = OptionMenu(self.prop_animal_crop_container,
+                                           self.animal_var,
+                                           *PROP_TYPES)
+        self.animal_drop_down.pack(side=LEFT)
+
         self.public_commercial_container = Frame(self.drop_down_container)
         self.public_commercial_container.pack()
 
@@ -157,9 +161,10 @@ class OwnerRegistrationWindow:
                                   font="Times 16")
         self.public_label.pack(side=LEFT)
         self.public_var = StringVar(master)
+        self.public_var.set(PUB_COMM_VALUES[0])
         self.public_drop_down = OptionMenu(self.public_commercial_container,
                                            self.public_var,
-                                           *PROP_TYPES)
+                                           *PUB_COMM_VALUES)
         self.public_drop_down.pack(side=LEFT)
 
         self.commercial_label = Label(self.public_commercial_container,
@@ -167,9 +172,10 @@ class OwnerRegistrationWindow:
                                       font="Times 16")
         self.commercial_label.pack(side=LEFT)
         self.commercial_var = StringVar(master)
+        self.commercial_var.set(PUB_COMM_VALUES[1])
         self.commercial_drop_down = OptionMenu(self.public_commercial_container,
                                                self.commercial_var,
-                                               *PROP_TYPES)
+                                               *PUB_COMM_VALUES)
         self.commercial_drop_down.pack(side=LEFT)
 
         self.button_container = Frame(master)
@@ -182,6 +188,16 @@ class OwnerRegistrationWindow:
                                     text="Cancel",
                                     padx=10)
         self.cancel_button.pack(side=RIGHT)
+
+
+    def crop_changed_event_handler(self, event):
+        if (self.prop_type_var.get() != PROP_TYPES[0]):
+            self.animal_label.pack_forget()
+            self.animal_drop_down.pack_forget()
+        else:
+            self.animal_label.pack(side=LEFT)
+            self.animal_drop_down.pack(side=LEFT)
+
 
 root = Tk()
 my_gui = OwnerRegistrationWindow(root)
