@@ -129,9 +129,9 @@ class OwnerRegistrationWindow:
         self.prop_type_var.set(PROP_TYPES[0])
         self.prop_type_drop_down = OptionMenu(self.prop_animal_crop_container,
                                               self.prop_type_var,
-                                              *PROP_TYPES)
+                                              *PROP_TYPES,
+                                              command=self.crop_changed_event_handler)
         self.prop_type_drop_down.pack(side=LEFT)
-        self.prop_type_drop_down.bind("<Leave>", self.crop_changed_event_handler)
 
         self.crop_label = Label(self.prop_animal_crop_container,
                                   text="Crop*:",
