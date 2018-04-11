@@ -1,14 +1,15 @@
 from tkinter import *
 
+
 class LoginWindow:
     def __init__(self, master):
         self.master = master
         master.title("Login Window")
 
-        self.label = Label(master,
+        self.welcome_label = Label(master,
                            text="ATL Gardens, Farms, and Orchards",
                            font="Times 48")
-        self.label.pack(pady=(0, 30))
+        self.welcome_label.pack(pady=(0, 30))
 
         self.email_password_container = Frame(master)
         self.email_password_container.pack(pady=(0, 20))
