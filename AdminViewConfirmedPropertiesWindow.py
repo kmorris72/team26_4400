@@ -6,7 +6,7 @@ from tkinter import ttk
 COLUMN_NAMES = ["Name", "Address", "City", "Zip", "Size", "Type", "Public", "Commercial",
                 "ID", "Verified by", "Avg. Rating"]
 
-# 
+# The names of the columns that can be used as search terms.
 SEARCH_BY = ["Name", "Zip", "Type", "Verified by", "Avg. Rating"]
 
 
@@ -18,15 +18,15 @@ class AdminViewConfirmedPropertiesWindow:
         self.welcome_label = Label(master,
                            text="Confirmed Properties:",
                            font="Times 36")
-        self.welcome_label.pack(pady=(0, 30))
+        self.welcome_label.pack(pady=(0, 5))
 
         self.table = ttk.Treeview(self.master, columns=tuple(COLUMN_NAMES))
-        self.table.pack()
+        self.table.pack(pady=(0, 50))
         self.table.displaycolumns = COLUMN_NAMES
 
         # This line makes the annoying empty first column go away.
         self.table["show"] = "headings"
-        
+
         for col in COLUMN_NAMES:
             self.table.column(col, width=75)
             self.table.heading(col, text=col)
