@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import ttk
 
 
-# Column names for the data table. Also serve as possible "serve by" terms.
+# Column names for the data table. Also serve as possible "search by" terms.
 COLUMN_NAMES = ["Username", "Email", "Logged Visits"]
 
 
