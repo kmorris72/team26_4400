@@ -1,17 +1,25 @@
+import MySQLdb as sql
 from tkinter import *
+import tkinter.messagebox as messagebox
+from OwnerRegistrationWindow import OwnerRegistrationWindow
+from VisitorRegistrationWindow import VisitorRegistrationWindow
 
 
-class LoginWindow:
-    def __init__(self, master):
+class LoginWindow(Frame):
+    def __init__(self, master, db_cursor):
+        Frame.__init__(self, master)
+
         self.master = master
-        master.title("Login Window")
+        # master.title("Login Window")
 
-        self.welcome_label = Label(master,
+        self.db_cursor = db_cursor
+
+        self.welcome_label = Label(self,
                            text="ATL Gardens, Farms, and Orchards",
                            font="Times 48")
         self.welcome_label.pack(pady=(0, 30))
 
-        self.email_password_container = Frame(master)
+        self.email_password_container = Frame(self)
         self.email_password_container.pack(pady=(0, 20))
 
         self.label_container = Frame(self.email_password_container)
@@ -38,22 +46,38 @@ class LoginWindow:
                                    width=30)
         self.password_text.pack(side=BOTTOM)
 
-        self.login_button = Button(master,
+        self.login_button = Button(self,
                                    text="Login",
-                                   padx=10)
+                                   padx=10,
+                                   command=self.login_button_click_handler)
         self.login_button.pack(pady=(0, 30))
 
-        self.reg_button_container = Frame(master)
+        self.reg_button_container = Frame(self)
         self.reg_button_container.pack(pady=(0, 30))
         self.owner_reg_button = Button(self.reg_button_container,
                                        text="New Owner Registration",
-                                       padx=10)
+                                       padx=10,
+                                       command=self.owner_reg_button_click_handler)
         self.owner_reg_button.pack(side=LEFT, padx=(0, 50))
         self.visitor_reg_button = Button(self.reg_button_container,
                                          text="New Visitor Registration",
-                                         padx=10)
+                                         padx=10,
+                                         command=self.visitor_reg_button_click_handler)
         self.visitor_reg_button.pack(side=RIGHT)
 
-root = Tk()
-my_gui = LoginWindow(root)
-root.mainloop()
+    def login_button_click_handler(self):
+        email = self.email_text.get().strip()
+        password = self.password_text.get().strip()
+        query = "SELECT * FROM User WHERE Email=\"{}\" AND Password=\"{}\"".format(email, password)
+        self.db_cursor.execute(query)
+        data = self.db_cursor.fetchall()
+        if data:
+            usertype = data[0][3]
+        else:
+            messagebox.showinfo("Alert", "Invalid Email/Password Combination")
+
+    def owner_reg_button_click_handler(self):
+        return
+
+    def visitor_reg_button_click_handler(self):
+        return

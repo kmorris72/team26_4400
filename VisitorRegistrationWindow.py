@@ -1,17 +1,19 @@
 from tkinter import *
 
 
-class VisitorRegistrationWindow:
-    def __init__(self, master):
-        self.master = master
-        master.title("Visitor Registration")
+class VisitorRegistrationWindow(Frame):
+    def __init__(self, master, db_cursor):
+        Frame.__init__(self, master)
 
-        self.welcome_label = Label(master,
+        self.master = master
+        # master.title("Visitor Registration")
+
+        self.welcome_label = Label(self,
                            text="New Visitor Registration",
                            font="Times 48")
         self.welcome_label.pack(pady=(0, 30))
 
-        self.text_entry_container = Frame(master)
+        self.text_entry_container = Frame(self)
         self.text_entry_container.pack(pady=(0, 20))
 
         self.label_container = Frame(self.text_entry_container)
@@ -56,7 +58,7 @@ class VisitorRegistrationWindow:
                                    width=30)
         self.confirm_password_text.pack(side=BOTTOM)
 
-        self.button_container = Frame(master)
+        self.button_container = Frame(self)
         self.button_container.pack(pady=(0, 30))
         self.reg_button = Button(self.button_container,
                                        text="Register Visitor",
@@ -66,7 +68,3 @@ class VisitorRegistrationWindow:
                                          text="Cancel",
                                          padx=10)
         self.cancel_button.pack(side=RIGHT)
-
-root = Tk()
-my_gui = VisitorRegistrationWindow(root)
-root.mainloop()
