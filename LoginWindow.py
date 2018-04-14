@@ -1,16 +1,15 @@
 import MySQLdb as sql
 from tkinter import *
 import tkinter.messagebox as messagebox
-from OwnerRegistrationWindow import OwnerRegistrationWindow
-from VisitorRegistrationWindow import VisitorRegistrationWindow
+
+
+# Types of users. Used to determine which screen to go to next.
+USER_TYPES = ["ADMIN", "OWNER", "VISITOR"]
 
 
 class LoginWindow(Frame):
     def __init__(self, master, db_cursor):
         Frame.__init__(self, master)
-
-        self.master = master
-        # master.title("Login Window")
 
         self.db_cursor = db_cursor
 
@@ -72,12 +71,18 @@ class LoginWindow(Frame):
         self.db_cursor.execute(query)
         data = self.db_cursor.fetchall()
         if data:
-            usertype = data[0][3]
+            user_type = data[0][3]
+            if user_type == USER_TYPES[0]:
+                return
+            elif user_type == USER_TYPES[1]:
+                self.master.master.show_window("OwnerRegistrationWindow")
+            else:
+                self.master.master.show_window("VisitorRegistrationWindow")
         else:
             messagebox.showinfo("Alert", "Invalid Email/Password Combination")
 
     def owner_reg_button_click_handler(self):
-        return
+        self.master.master.show_window("OwnerRegistrationWindow")
 
     def visitor_reg_button_click_handler(self):
-        return
+        self.master.master.show_window("VisitorRegistrationWindow")

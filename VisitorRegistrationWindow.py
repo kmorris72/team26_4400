@@ -5,9 +5,6 @@ class VisitorRegistrationWindow(Frame):
     def __init__(self, master, db_cursor):
         Frame.__init__(self, master)
 
-        self.master = master
-        # master.title("Visitor Registration")
-
         self.welcome_label = Label(self,
                            text="New Visitor Registration",
                            font="Times 48")
@@ -66,5 +63,10 @@ class VisitorRegistrationWindow(Frame):
         self.reg_button.pack(side=LEFT, padx=(0, 50))
         self.cancel_button = Button(self.button_container,
                                          text="Cancel",
-                                         padx=10)
+                                         padx=10,
+                                         command=self.cancel_button_clicked_handler)
         self.cancel_button.pack(side=RIGHT)
+
+
+    def cancel_button_clicked_handler(self):
+        self.master.master.show_window("LoginWindow")

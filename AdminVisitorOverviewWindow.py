@@ -6,17 +6,16 @@ from tkinter import ttk
 COLUMN_NAMES = ["Username", "Email", "Logged Visits"]
 
 
-class AdminVisitorOverviewWindow:
-    def __init__(self, master):
-        self.master = master
-        master.title("Visitor Overview")
+class AdminVisitorOverviewWindow(Frame):
+    def __init__(self, master, db_cursor):
+        Frame.__init__(self, master)
 
-        self.welcome_label = Label(master,
+        self.welcome_label = Label(self,
                            text="All Visitors in System",
                            font="Times 36")
         self.welcome_label.pack(pady=(0, 5))
 
-        self.table = ttk.Treeview(self.master, columns=tuple(COLUMN_NAMES))
+        self.table = ttk.Treeview(self, columns=tuple(COLUMN_NAMES))
         self.table.pack(pady=(0, 50))
         self.table.displaycolumns = COLUMN_NAMES
 
@@ -27,7 +26,7 @@ class AdminVisitorOverviewWindow:
             self.table.column(col, width=120)
             self.table.heading(col, text=col)
 
-        self.button_container = Frame(master)
+        self.button_container = Frame(self)
         self.button_container.pack(padx=(50, 50), pady=(0, 30))
 
         self.delete_back_button_container = Frame(self.button_container)
@@ -51,7 +50,7 @@ class AdminVisitorOverviewWindow:
         self.search_container = Frame(self.button_container)
         self.search_container.pack(side=LEFT)
 
-        self.search_by_var = StringVar(self.master)
+        self.search_by_var = StringVar(self)
         self.search_by_var.set(COLUMN_NAMES[0])
 
         self.search_by_drop_down = OptionMenu(self.search_container,
@@ -68,8 +67,3 @@ class AdminVisitorOverviewWindow:
                                     text="Search Properties",
                                     padx=10)
         self.search_button.pack(side=TOP)
-
-
-root = Tk()
-my_gui = AdminVisitorOverviewWindow(root)
-root.mainloop()
