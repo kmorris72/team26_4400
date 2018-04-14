@@ -1,53 +1,88 @@
+import MySQLdb as sql
 from tkinter import *
+import tkinter.messagebox as messagebox
 
-class LoginWindow:
-    def __init__(self, master):
-        self.master = master
-        master.title("Login Window")
 
-        self.label = Label(master,
+# Types of users. Used to determine which screen to go to next.
+USER_TYPES = ["ADMIN", "OWNER", "VISITOR"]
+
+
+class LoginWindow(Frame):
+    def __init__(self, master, db_cursor):
+        Frame.__init__(self, master)
+
+        self.db_cursor = db_cursor
+
+        self.welcome_label = Label(self,
                            text="ATL Gardens, Farms, and Orchards",
                            font="Times 48")
-        self.label.pack()
+        self.welcome_label.pack(pady=(0, 30))
 
-        self.email_container = Frame(master)
-        self.email_container.pack()
-        self.email_label = Label(self.email_container,
+        self.email_password_container = Frame(self)
+        self.email_password_container.pack(pady=(0, 20))
+
+        self.label_container = Frame(self.email_password_container)
+        self.label_container.pack(side=LEFT)
+
+        self.text_entry_container = Frame(self.email_password_container)
+        self.text_entry_container.pack(side=RIGHT)
+
+        self.email_label = Label(self.label_container,
                                  text="Email:",
                                  font="Times 16")
-        self.email_label.pack(side=LEFT)
-        self.email_text = Entry(self.email_container,
+        self.email_label.pack(side=TOP)
+        self.email_text = Entry(self.text_entry_container,
                                 font="Times 16",
                                 width=30)
-        self.email_text.pack(side=LEFT)
+        self.email_text.pack(side=TOP)
 
-        self.password_container = Frame(master)
-        self.password_container.pack()
-        self.password_label = Label(self.password_container,
+        self.password_label = Label(self.label_container,
                                     text="Password:",
                                     font="Times 16")
-        self.password_label.pack(side=LEFT)
-        self.password_text = Entry(self.password_container,
+        self.password_label.pack(side=BOTTOM)
+        self.password_text = Entry(self.text_entry_container,
                                    font="Times 16",
                                    width=30)
-        self.password_text.pack(side=LEFT)
+        self.password_text.pack(side=BOTTOM)
 
-        self.login_button = Button(master,
+        self.login_button = Button(self,
                                    text="Login",
-                                   padx=10)
-        self.login_button.pack()
+                                   padx=10,
+                                   command=self.login_button_click_handler)
+        self.login_button.pack(pady=(0, 30))
 
-        self.reg_button_container = Frame(master)
-        self.reg_button_container.pack()
+        self.reg_button_container = Frame(self)
+        self.reg_button_container.pack(pady=(0, 30))
         self.owner_reg_button = Button(self.reg_button_container,
                                        text="New Owner Registration",
-                                       padx=10)
-        self.owner_reg_button.pack(side=LEFT)
+                                       padx=10,
+                                       command=self.owner_reg_button_click_handler)
+        self.owner_reg_button.pack(side=LEFT, padx=(0, 50))
         self.visitor_reg_button = Button(self.reg_button_container,
                                          text="New Visitor Registration",
-                                         padx=10)
+                                         padx=10,
+                                         command=self.visitor_reg_button_click_handler)
         self.visitor_reg_button.pack(side=RIGHT)
 
-root = Tk()
-my_gui = LoginWindow(root)
-root.mainloop()
+    def login_button_click_handler(self):
+        email = self.email_text.get().strip()
+        password = self.password_text.get().strip()
+        query = "SELECT * FROM User WHERE Email=\"{}\" AND Password=\"{}\"".format(email, password)
+        self.db_cursor.execute(query)
+        data = self.db_cursor.fetchall()
+        if data:
+            user_type = data[0][3]
+            if user_type == USER_TYPES[0]:
+                return
+            elif user_type == USER_TYPES[1]:
+                self.master.master.show_window("OwnerRegistrationWindow")
+            else:
+                self.master.master.show_window("VisitorRegistrationWindow")
+        else:
+            messagebox.showinfo("Alert", "Invalid Email/Password Combination")
+
+    def owner_reg_button_click_handler(self):
+        self.master.master.show_window("OwnerRegistrationWindow")
+
+    def visitor_reg_button_click_handler(self):
+        self.master.master.show_window("VisitorRegistrationWindow")
