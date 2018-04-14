@@ -3,7 +3,7 @@
 import MySQLdb as sql
 from tkinter import *
 from tkinter import ttk
-
+#junk
 '''
 TODO
 get Visitor ID num and show it on label
