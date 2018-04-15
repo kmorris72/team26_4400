@@ -3,71 +3,35 @@
 import MySQLdb as sql
 from tkinter import *
 from tkinter import ttk
-#junk
+
 '''
 TODO
 get Visitor ID num and show it on label
 make the logout button actually logout and return user to login page
-add "Sort By" drop down and function
-add "Search By" input and function
 Add ability to search by visit number range or avg rating range
 Add ability to select a property
-Add "View Property" button that goes to that propertie's page
-Add "View Visit History" and function
-
+Add "View Property" function
+Add "View Visit History" function
 CURRENTLY DOING
-fixing the search on visits or avg visits
 '''
 
 ATTRS = 'Name, ID, Street, Size, City, Zip, PropertyType, IsPublic, IsCommercial'
 
 # This class is the whole window and its functionality
-class VisitorHomeWindow():
+class VisitorHomeWindow(Frame):
 	def __init__(self, master, cursor):
+		Frame.__init__(self, master)
 
-		# a pointer?thing to allow access to DB
-		self.cursor = cursor
+		# a thing to allow access to DB
+		self.cursor = db.cursor()
 
-		# 'master' should be a Tk() instance
-		self.master = master
-		master.title("Visitor Home")
+		sql = f"SELECT {ATTRS} FROM Property COUNT(Rating), AVG(Rating) FROM Property LEFT OUTER JOIN \
+			  Visit ON ID=PropertyID"
 
-		self.label = Label(master,
-						   text="Nice to see you <Visitor ID>",
-						   font="Times 22")
-		# make Tkinter put the widget on the page
-		self.label.pack()
-
-		# make column IDs (cid). The "0th" column has a builtin cid "#0"
-		self.tree = ttk.Treeview(master,
-		 columns=('ID', 'Street', 'Size', 'City', 'Zip', 
-		 		  'Type', 'Public', 'Commercial', 'Visits', 'Avg Rating'))
-		self.tree.pack()
-
-		# tell Tkinter 'hey we want to see these'
-		self.tree.displaycolumns = ['ID', 'Street', 'Size', 'City', 'Zip', 
-									'Type', 'Public', 'Commercial', 'Visits', 'Avg Rating']
-
-		# set default column width
-		cols = ['#0', 'ID', 'Street', 'Size', 'City', 'Zip', 
-				'Type', 'Public', 'Commercial', 'Visits', 'Avg Rating']
-		for c in cols:
-			self.tree.column(f'{c}', width=75)
-
-		# Fill the column headers with text.
-		# there's probably a better way to do this.
-		self.tree.heading('#0', text='Name')
-		self.tree.heading('ID', text='ID')
-		self.tree.heading('Street', text='Street')
-		self.tree.heading('Size', text='Size')
-		self.tree.heading('City', text='City')
-		self.tree.heading('Zip', text='Zip')
-		self.tree.heading('Type', text='Type')
-		self.tree.heading('Public', text='Public')
-		self.tree.heading('Commercial', text='Commercial')
-		self.tree.heading('Visits', text='Visits')
-		self.tree.heading('Avg Rating', text='Avg Rating')
-
+		 
+		#############
+		# FUNCTIONS #
+		#############
 
 		def populate_table(self, sql, tree, search_val):
 		
@@ -115,7 +79,109 @@ class VisitorHomeWindow():
 				
 					count += 1
 
-		# buttons
+
+		# Run the sort/search button
+		# Get values to sort and maybe search by
+		def sort_search_go(self):
+
+			# Value of the dropdown sort by menu
+			option_val = self.sort_var.get()
+
+			# This is the value of the `search_entry` entry box.
+			search_val = self.search_entry.get()
+			sql = ""
+
+			# User is specifying a search (`SELECT A FROM R WHERE B LIKE` query)
+			if search_val not in  ["", "Search"]:
+			
+				# Searching by Visits or Avg. Rating
+				if option_val in ["Visits", "Avg. Rating"]:
+					bounds = search_val.split(",")
+
+					# used as an alias in SQL
+					ov = "ac"
+					if option_val == "Visits":
+						ov = "cr"
+
+					sql = f"SELECT {ATTRS}, COUNT(Rating) AS cr, AVG(Rating) AS ar FROM Property LEFT OUTER JOIN \
+							Visit ON ID=PropertyID GROUP BY Name HAVING ({ov} > '{bounds[0]}' AND \
+							{ov} < '{bounds[1]}') ORDER BY {ov} DESC"
+					
+				# Searching by any other DB attribute.
+				else:
+					sql = f"SELECT {ATTRS}, COUNT(Rating), AVG(Rating) FROM Property LEFT OUTER JOIN \
+							Visit ON ID=PropertyID WHERE {option_val} LIKE '%{search_val}%' \
+							GROUP BY Name ORDER BY {option_val}"
+
+
+			# Not sorting by Visits or Avg. Rating and not searching anything.
+			# So, sorting by anything other than visits or avg rating.
+			elif option_val not in ["Visits", "Avg. Rating"]:
+				sql = f"SELECT {ATTRS}, COUNT(Rating), AVG(Rating) FROM Property LEFT OUTER JOIN \
+						Visit ON ID=PropertyID GROUP BY Name ORDER BY {option_val}"
+
+			# Sorting by Avg. Rating
+			elif option_val == "Avg. Rating":
+				sql = f"SELECT {ATTRS}, COUNT(Rating), AVG(Rating) AS ar FROM Property LEFT OUTER JOIN \
+						Visit ON ID=PropertyID GROUP BY Name ORDER BY ar DESC"
+			
+			# Sorting by Num Visits
+			else:
+				sql = f"SELECT {ATTRS}, COUNT(Rating) AS cr, AVG(Rating) FROM Property LEFT OUTER JOIN \
+						Visit ON ID=PropertyID GROUP BY Name ORDER BY cr DESC"
+
+			return populate_table(self, sql, self.tree, search_val="")
+
+
+		# 'master' should be a Tk() instance
+		self.master = master
+		master.title("Visitor Home")
+		self.label = Label(master,
+						   text="Nice to see you <Visitor ID>",
+						   font="Times 22")
+
+		# make Tkinter put the widget on the page
+		self.label.pack()
+
+		############
+		#GUI MAKING#
+		############
+
+		# Time to make a "Table" with Treeview
+		# make column IDs (cid). The "0th" column has a builtin cid "#0"
+		self.tree = ttk.Treeview(master,
+		columns=('ID', 'Street', 'Size', 'City', 'Zip', 
+			     'Type', 'Public', 'Commercial', 'Visits', 'Avg Rating'))
+		self.tree.pack()
+
+		# tell Tkinter 'hey we want to see these'
+		self.tree.displaycolumns = ['ID', 'Street', 'Size', 'City', 'Zip', 
+									'Type', 'Public', 'Commercial', 'Visits', 'Avg Rating']
+
+		# set default column width
+		cols = ['#0', 'ID', 'Street', 'Size', 'City', 'Zip', 
+				'Type', 'Public', 'Commercial', 'Visits', 'Avg Rating']	
+		for c in cols:
+			self.tree.column(f'{c}', width=75)
+
+		# Fill the column headers with text.
+		# there's probably a better way to do this.
+		self.tree.heading('#0', text='Name')
+		self.tree.heading('ID', text='ID')
+		self.tree.heading('Street', text='Street')
+		self.tree.heading('Size', text='Size')
+		self.tree.heading('City', text='City')
+		self.tree.heading('Zip', text='Zip')
+		self.tree.heading('Type', text='Type')
+		self.tree.heading('Public', text='Public')
+		self.tree.heading('Commercial', text='Commercial')
+		self.tree.heading('Visits', text='Visits')
+		self.tree.heading('Avg Rating', text='Avg Rating')
+
+		#############################
+		# Buttons. Glorious buttons.#
+		#############################
+
 		# View Property button
 		self.view_prop_button = Button(master, text="View Selected Property", font="Times 12")
 		self.view_prop_button.pack()
@@ -138,71 +204,25 @@ class VisitorHomeWindow():
 		self.search_entry.insert(0, "Search")
 		self.search_entry.pack(side=LEFT)
 
-		# Run the sort/search button
-		# Get values to sort and maybe search by
-		def sort_search_go(self):
-
-			# Value of the dropdown sort by menu
-			option_val = self.sort_var.get()
-
-			# This is the value of the `search_entry` entry box.
-			search_val = self.search_entry.get()
-			sql = ""
-
-			# User is specifying a search (`SELECT A FROM R WHERE B LIKE` query)
-			if search_val not in  ["", "Search"]:
-			
-				# Searching by Visits or Avg. Rating
-				if option_val in ["Visits", "Avg. Rating"]:
-					bounds = search_val.split(",")
-					print(bounds[0], bounds[1])
-					ov = "ac"
-					if option_val == "Visits":
-						ov = "cr"
-					sql = f"SELECT {ATTRS}, COUNT(Rating) AS cr, AVG(Rating) AS ar FROM Property INNER JOIN \
-							Visit ON ID=PropertyID GROUP BY Name ORDER BY {ov} HAVING {ov} > {bounds[0]}"
-
-					return populate_table(self, sql, self.tree, search_val)
-					
-				# Searching by any other DB attribute.
-				else:
-					sql = f"SELECT {ATTRS}, COUNT(Rating), AVG(Rating) FROM Property INNER JOIN \
-							Visit ON ID=PropertyID WHERE {option_val} LIKE '%{search_val}%' \
-							GROUP BY Name ORDER BY {option_val}"
-
-			# Not sorting by Visits or Avg. Rating and not searching anything.
-			# So, sorting by anything other than visits or avg rating.
-			elif option_val not in ["Visits", "Avg. Rating"]:
-				sql = f"SELECT {ATTRS}, COUNT(Rating), AVG(Rating) FROM Property INNER JOIN \
-						Visit ON ID=PropertyID GROUP BY Name ORDER BY {option_val}"
-
-			# Sorting by Avg. Rating
-			elif option_val == "Avg. Rating":
-				sql = f"SELECT {ATTRS}, COUNT(Rating), AVG(Rating) AS ar FROM Property INNER JOIN \
-						Visit ON ID=PropertyID GROUP BY Name ORDER BY ar DESC"
-			
-			# Sorting by Num Visits
-			else:
-				sql = f"SELECT {ATTRS}, COUNT(Rating) AS cr, AVG(Rating) FROM Property INNER JOIN \
-						Visit ON ID=PropertyID GROUP BY Name ORDER BY cr DESC"
-
-			return populate_table(self, sql, self.tree, search_val="")
-
+		# Run a sort or search button
 		# lambda is necessary to avoid the function being called immediately
 		self.go_button = Button(master, text="Sort/Search", 
 								command=lambda: sort_search_go(self))
 		self.go_button.pack(side=LEFT)
 
-		# logout
+		# logout buttons
 		self.logout_button = Button(master,
 									text="Logout",
 									font="Times 12")
 		self.logout_button.pack(side=RIGHT)
 
-		sql = f"SELECT {ATTRS}, COUNT(Rating), AVG(Rating) FROM Property INNER JOIN \
+		self.sql = f"SELECT {ATTRS}, COUNT(Rating), AVG(Rating) FROM Property LEFT OUTER JOIN \
 				Visit ON ID=PropertyID GROUP BY Name"
-		populate_table(self, sql, self.tree, search_val="")
-		
+		populate_table(self, self.sql, self.tree, search_val="")
+
+				
+
+# everyone get your database before class can begin
 db = sql.connect(host="academic-mysql.cc.gatech.edu",
 					 user="cs4400_team_26",
 					 passwd="YFxUWSqD",
