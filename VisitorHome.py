@@ -99,7 +99,7 @@ class VisitorHomeWindow(Frame):
 					bounds = search_val.split(",")
 
 					# used as an alias in SQL
-					ov = "ac"
+					ov = "ar"
 					if option_val == "Visits":
 						ov = "cr"
 
