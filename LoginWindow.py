@@ -66,7 +66,7 @@ class LoginWindow(Frame):
 
     def login_button_click_handler(self):
         email = self.email_text.get().strip()
-        password = self.password_text.get().strip()
+        password = self.password_text.get()
         query = "SELECT * FROM User WHERE Email=\"{}\" AND Password=\"{}\"".format(email, password)
         self.db_cursor.execute(query)
         data = self.db_cursor.fetchall()
@@ -80,6 +80,7 @@ class LoginWindow(Frame):
                 self.master.master.show_window("VisitorRegistrationWindow")
         else:
             messagebox.showinfo("Alert", "Invalid Email/Password Combination")
+            
 
     def owner_reg_button_click_handler(self):
         self.master.master.show_window("OwnerRegistrationWindow")

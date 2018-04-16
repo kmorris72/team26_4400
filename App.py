@@ -31,6 +31,7 @@ class App(Tk):
         self.curr_window = "LoginWindow"
         self.show_window(self.curr_window)
 
+
     def show_window(self, window):
         self.windows[self.curr_window].pack_forget()
         self.windows[window].pack()
