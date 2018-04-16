@@ -69,7 +69,7 @@ class VisitorRegistrationWindow(Frame):
                                          text="Cancel",
                                          padx=10,
                                          command=self.cancel_button_clicked_handler)
-        self.cancel_button.pack(side=RIGHT)
+        self.cancel_button.pack(side=RIGHT)   
 
 
     def reg_button_clicked_handler(self):
@@ -111,8 +111,17 @@ class VisitorRegistrationWindow(Frame):
             insert_query = "INSERT INTO User VALUES (\"{}\", \"{}\", \"{}\", \"VISITOR\")".format(username, email, password)
             self.db_cursor.execute(insert_query)
             messagebox.showinfo("Alert", "New Visitor Registered! You can now login with the specified email and password.")
+            self.clear_text_boxes()
             self.master.master.show_window("LoginWindow")
 
 
     def cancel_button_clicked_handler(self):
+        self.clear_text_boxes()
         self.master.master.show_window("LoginWindow")
+
+
+    def clear_text_boxes(self):
+        self.email_text.delete(0, END)
+        self.username_text.delete(0, END)
+        self.password_text.delete(0, END)
+        self.confirm_password_text.delete(0, END)
