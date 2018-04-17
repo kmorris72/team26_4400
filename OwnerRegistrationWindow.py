@@ -1,5 +1,6 @@
 from tkinter import *
 import tkinter.messagebox as messagebox
+import hashlib
 
 
 # The amount of padding between each label.
@@ -194,7 +195,8 @@ class OwnerRegistrationWindow(Frame):
         self.button_container.pack(pady=(0, 30))
         self.reg_button = Button(self.button_container,
                                  text="Register Owner",
-                                 padx=10)
+                                 padx=10,
+                                 command=self.reg_button_clicked_handler)
         self.reg_button.pack(side=LEFT, padx=(0, 50))
         self.cancel_button = Button(self.button_container,
                                     text="Cancel",
@@ -236,7 +238,53 @@ class OwnerRegistrationWindow(Frame):
             messagebox.showinfo("Alert", "That username is already taken.")
             duplicate_username = True
 
-        # NOT DONE
+        # Check that the property name is not already being used.
+        prop_name = self.property_name_text.get().strip()
+        duplicate_prop_name = False
+        prop_name_query = "SELECT * FROM Property WHERE Name=\"{}\"".format(prop_name)
+        self.db_cursor.execute(prop_name_query)
+        if self.db_cursor.fetchall():
+            messagebox.showinfo("Alert", "A property with that name already exists.")
+            duplicate_prop_name = True
+
+        # Check that property size is a float.
+        prop_size = self.acres_text.get()
+        bad_size = False
+        try:
+            prop_size = float(prop_size)
+        except:
+            messagebox.showinfo("Alert", "Please make sure that the number of acres is expressed as a decimal number.")
+            bad_size = True
+        
+        # Check that property zip is an int.
+        prop_zip = self.zip_text.get()
+        bad_zip = False
+        try:
+            prop_zip = int(prop_zip)
+        except:
+            messagebox.showinfo("Alert", "Please make sure that the zip code is expressed as a non-decimal number.")
+            bad_zip = True
+
+        # If none of the above conditions were violated, add the user and send them back to the login window.
+        if no_empty_text and passwords_match and not duplicate_email and not duplicate_username and not duplicate_prop_name and not bad_size and not bad_zip:
+            password = hashlib.md5(self.password_text.get().encode("utf-8")).digest()
+            user_insert_query = "INSERT INTO User VALUES (\"{}\", \"{}\", \"{}\", \"OWNER\")".format(username, email, password)
+            self.db_cursor.execute(user_insert_query)
+            highest_prop_id_query = "SELECT MAX(ID) FROM Property"
+            self.db_cursor.execute(highest_prop_id_query)
+            prop_id = self.db_cursor.fetchall()[0][0] + 1
+            is_commercial = 1 if self.commercial_var.get() == PUB_COMM_VALUES[0] else 0
+            is_public = 1 if self.public_var.get() == PUB_COMM_VALUES[0] else 0
+            prop_street = self.street_address_text.get().strip()
+            prop_city = self.city_text.get().strip()
+            prop_type = self.prop_type_var.get().upper()
+            prop_insert_query = "INSERT INTO Property VALUES ({}, \"{}\", {}, {}, {}, \"{}\", \"{}\", {}, \"{}\", \"{}\", NULL)".format(prop_id, prop_name, prop_size, is_commercial, is_public, prop_street, prop_city, prop_zip, prop_type, username)
+            self.db_cursor.execute(prop_insert_query)
+            messagebox.showinfo("Alert", "New Owner Registered! You can now login with the specified email and password.")
+            self.clear_text_boxes_reset_drop_downs()
+            self.master.master.show_window("LoginWindow")
+
+        # STILL NEED TO SELECT WHICH ITEM TYPE IS BEING ADDED AND ADD IT
 
     
     def cancel_button_clicked_handler(self):
