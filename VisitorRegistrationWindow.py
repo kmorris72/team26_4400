@@ -1,5 +1,6 @@
 from tkinter import *
 import tkinter.messagebox as messagebox
+import hashlib
 
 
 class VisitorRegistrationWindow(Frame):
@@ -107,7 +108,7 @@ class VisitorRegistrationWindow(Frame):
         
         # If none of the above conditions were violated, add the user and send them back to the login window.
         if no_empty_text and passwords_match and not duplicate_email and not duplicate_username:
-            password = self.password_text.get()
+            password = hashlib.md5(self.password_text.get().encode("utf-8")).digest()
             insert_query = "INSERT INTO User VALUES (\"{}\", \"{}\", \"{}\", \"VISITOR\")".format(username, email, password)
             self.db_cursor.execute(insert_query)
             messagebox.showinfo("Alert", "New Visitor Registered! You can now login with the specified email and password.")
