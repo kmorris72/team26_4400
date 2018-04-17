@@ -12,6 +12,9 @@ PROP_TYPES = ["Farm", "Orchard", "Garden"]
 # The values for "Public?" or "Commercial?".
 PUB_COMM_VALUES = ["Yes", "No"]
 
+# The two types of farm items.
+ITEM_TYPES = ["Crop", "Animal"]
+
 
 class OwnerRegistrationWindow(Frame):
     def __init__(self, parent, db_cursor):
@@ -130,7 +133,7 @@ class OwnerRegistrationWindow(Frame):
         
         self.prop_type_var = StringVar(self)
         self.prop_type_var.set(PROP_TYPES[0])
-        self.prop_type_var.trace("w", self.crop_changed_event_handler)
+        self.prop_type_var.trace("w", self.prop_type_changed_event_handler)
         self.prop_type_drop_down = OptionMenu(self.prop_animal_crop_container,
                                               self.prop_type_var,
                                               *PROP_TYPES)
@@ -143,10 +146,10 @@ class OwnerRegistrationWindow(Frame):
         crop_query = "SELECT Name FROM FarmItem WHERE Type<>\"Animal\""
         self.db_cursor.execute(crop_query)
         crop_list = list(self.db_cursor.fetchall())
-        self.crop_var = StringVar(self)
-        self.crop_var.set(crop_list[0])
         for i in range(len(crop_list)):
             crop_list[i] = crop_list[i][0].strip("{").strip("}").strip()
+        self.crop_var = StringVar(self)
+        self.crop_var.set(crop_list[0])
         self.crop_drop_down = OptionMenu(self.prop_animal_crop_container,
                                          self.crop_var,
                                          *crop_list)
@@ -159,6 +162,8 @@ class OwnerRegistrationWindow(Frame):
         animal_query = "SELECT Name FROM FarmItem WHERE Type=\"Animal\""
         self.db_cursor.execute(animal_query)
         animal_list = list(self.db_cursor.fetchall())
+        for i in range(len(animal_list)):
+            animal_list[i] = animal_list[i][0].strip("{").strip("}").strip()
         self.animal_var = StringVar(self)
         self.animal_var.set(animal_list[0])
         self.animal_drop_down = OptionMenu(self.prop_animal_crop_container,
@@ -190,6 +195,18 @@ class OwnerRegistrationWindow(Frame):
                                                self.commercial_var,
                                                *PUB_COMM_VALUES)
         self.commercial_drop_down.pack(side=LEFT)
+
+        # Allows the user to select whether they want to have an animal or crop (if their property is a farm).
+        self.item_type_label = Label(self.public_commercial_container,
+                                     text="Item Type*:",
+                                     font="Times 16")
+        self.item_type_label.pack(side=LEFT)
+        self.item_type_var = StringVar(self)
+        self.item_type_var.set(ITEM_TYPES[0])
+        self.item_type_drop_down = OptionMenu(self.public_commercial_container,
+                                              self.item_type_var,
+                                              *ITEM_TYPES)
+        self.item_type_drop_down.pack(side=LEFT)
 
         self.button_container = Frame(self)
         self.button_container.pack(pady=(0, 30))
@@ -265,14 +282,16 @@ class OwnerRegistrationWindow(Frame):
             messagebox.showinfo("Alert", "Please make sure that the zip code is expressed as a non-decimal number.")
             bad_zip = True
 
-        # If none of the above conditions were violated, add the user and send them back to the login window.
+        # If none of the above conditions were violated, add the user, their property, and their item and send them back to the login window.
         if no_empty_text and passwords_match and not duplicate_email and not duplicate_username and not duplicate_prop_name and not bad_size and not bad_zip:
             password = hashlib.md5(self.password_text.get().encode("utf-8")).digest()
             user_insert_query = "INSERT INTO User VALUES (\"{}\", \"{}\", \"{}\", \"OWNER\")".format(username, email, password)
             self.db_cursor.execute(user_insert_query)
+
             highest_prop_id_query = "SELECT MAX(ID) FROM Property"
             self.db_cursor.execute(highest_prop_id_query)
             prop_id = self.db_cursor.fetchall()[0][0] + 1
+
             is_commercial = 1 if self.commercial_var.get() == PUB_COMM_VALUES[0] else 0
             is_public = 1 if self.public_var.get() == PUB_COMM_VALUES[0] else 0
             prop_street = self.street_address_text.get().strip()
@@ -280,11 +299,21 @@ class OwnerRegistrationWindow(Frame):
             prop_type = self.prop_type_var.get().upper()
             prop_insert_query = "INSERT INTO Property VALUES ({}, \"{}\", {}, {}, {}, \"{}\", \"{}\", {}, \"{}\", \"{}\", NULL)".format(prop_id, prop_name, prop_size, is_commercial, is_public, prop_street, prop_city, prop_zip, prop_type, username)
             self.db_cursor.execute(prop_insert_query)
+
+            farm_item_name = ""
+            if prop_type == PROP_TYPES[0].upper():
+                if self.item_type_var.get() == ITEM_TYPES[0]:
+                    farm_item_name = self.crop_var.get()
+                else:
+                    farm_item_name = self.animal_var.get()
+            else:
+                farm_item_name = self.crop_var.get()
+            has_insert_query = "INSERT INTO Has VALUES ({}, \"{}\")".format(prop_id, farm_item_name)
+            self.db_cursor.execute(has_insert_query)
+
             messagebox.showinfo("Alert", "New Owner Registered! You can now login with the specified email and password.")
             self.clear_text_boxes_reset_drop_downs()
             self.master.master.show_window("LoginWindow")
-
-        # STILL NEED TO SELECT WHICH ITEM TYPE IS BEING ADDED AND ADD IT
 
     
     def cancel_button_clicked_handler(self):
@@ -292,13 +321,17 @@ class OwnerRegistrationWindow(Frame):
         self.clear_text_boxes_reset_drop_downs()
 
 
-    def crop_changed_event_handler(self, n, m, x):
+    def prop_type_changed_event_handler(self, n, m, x):
         if (self.prop_type_var.get() != PROP_TYPES[0]):
             self.animal_label.pack_forget()
             self.animal_drop_down.pack_forget()
+            self.item_type_label.pack_forget()
+            self.item_type_drop_down.pack_forget()
         else:
             self.animal_label.pack(side=LEFT)
             self.animal_drop_down.pack(side=LEFT)
+            self.item_type_label.pack(side=LEFT)
+            self.item_type_drop_down.pack(side=LEFT)
 
 
     def clear_text_boxes_reset_drop_downs(self):
