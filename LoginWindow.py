@@ -7,6 +7,9 @@ import hashlib
 # Types of users. Used to determine which screen to go to next.
 USER_TYPES = ["ADMIN", "OWNER", "VISITOR"]
 
+# The attributes of a property as a string (used for queries).
+PROP_ATTRS = "ID, Name, Size, IsCommercial, IsPublic, Street, City, Zip, PropertyType, Owner, ApprovedBy"
+
 
 class LoginWindow(Frame):
     def __init__(self, master, db_cursor):
@@ -65,16 +68,22 @@ class LoginWindow(Frame):
                                          command=self.visitor_reg_button_click_handler)
         self.visitor_reg_button.pack(side=RIGHT)
 
+
     def login_button_click_handler(self):
         email = self.email_text.get().strip()
         password = hashlib.md5(self.password_text.get().encode("utf-8")).digest()
-        query = "SELECT * FROM User WHERE Email=\"{}\" AND Password=\"{}\"".format(email, password)
+        query = """SELECT * FROM User
+                   WHERE Email=\"{}\" AND Password=\"{}\"""".format(email, password)
         self.db_cursor.execute(query)
         data = self.db_cursor.fetchall()
         if data:
             user_type = data[0][3]
             if user_type == USER_TYPES[0]:
-                self.master.master.windows["AdminViewConfirmedPropertiesWindow"].populate_table()
+                self.master.master.windows["AdminViewConfirmedPropertiesWindow"].populate_table("""SELECT {}, ROUND(AVG(Rating), 1)
+                                                                                                   FROM Property LEFT OUTER JOIN Visit
+                                                                                                   ON ID=PropertyID
+                                                                                                   WHERE IsPublic=1 AND ApprovedBy IS NOT NULL
+                                                                                                   GROUP BY Name""".format(PROP_ATTRS))
                 self.master.master.show_window("AdminViewConfirmedPropertiesWindow")
             elif user_type == USER_TYPES[1]:
                 self.master.master.show_window("OwnerRegistrationWindow")
@@ -86,6 +95,7 @@ class LoginWindow(Frame):
 
     def owner_reg_button_click_handler(self):
         self.master.master.show_window("OwnerRegistrationWindow")
+
 
     def visitor_reg_button_click_handler(self):
         self.master.master.show_window("VisitorRegistrationWindow")

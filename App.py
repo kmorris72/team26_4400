@@ -1,4 +1,4 @@
-from tkinter import *
+from tkinter import *   
 import MySQLdb as sql
 from LoginWindow import LoginWindow
 from OwnerRegistrationWindow import OwnerRegistrationWindow
@@ -13,7 +13,7 @@ ALL_WINDOWS = (LoginWindow, OwnerRegistrationWindow, VisitorRegistrationWindow, 
 
 
 class App(Tk):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         Tk.__init__(self)
 
         self.db = sql.connect(host="academic-mysql.cc.gatech.edu",
@@ -24,7 +24,7 @@ class App(Tk):
         self.db_cursor = self.db.cursor()
 
         container = Frame(self)
-        container.pack(side=TOP, fill=BOTH, expand = True)
+        container.pack(side=TOP, fill=BOTH, expand=True)
 
         self.windows = {}
 
@@ -35,12 +35,11 @@ class App(Tk):
         self.curr_window = "LoginWindow"
         self.show_window(self.curr_window)
 
-
     def show_window(self, window):
         self.windows[self.curr_window].pack_forget()
         self.windows[window].pack()
         self.curr_window = window
-
+        
 
 app = App()
 app.mainloop()

@@ -9,6 +9,9 @@ COLUMN_NAMES = ["Name", "Address", "City", "Zip", "Size", "Type", "Public", "Com
 # The names of the columns that can be used as search terms.
 SEARCH_BY = ["Name", "Zip", "Type", "Verified by", "Avg. Rating"]
 
+# The attributes of a property as a string (used for queries).
+PROP_ATTRS = "ID, Name, Size, IsCommercial, IsPublic, Street, City, Zip, PropertyType, Owner, ApprovedBy"
+
 
 class AdminViewConfirmedPropertiesWindow(Frame):
     def __init__(self, master, db_cursor):
@@ -35,8 +38,35 @@ class AdminViewConfirmedPropertiesWindow(Frame):
         self.button_container = Frame(self)
         self.button_container.pack(pady=(0, 30))
 
+        self.sort_container = Frame(self.button_container)
+        self.sort_container.pack(side=LEFT, padx=(50, 0))
+
+        self.sort_by_label = Label(self.sort_container,
+                                   text="Sort By:",
+                                   font="Times 16")
+        self.sort_by_label.pack(side=TOP, pady=(0, 10))
+
+        self.sort_by_var = StringVar(self)
+        self.sort_by_var.set(SEARCH_BY[0])
+
+        self.sort_drop_down = OptionMenu(self.sort_container,
+                                         self.sort_by_var,
+                                         *SEARCH_BY)
+        self.sort_drop_down.pack(side=TOP, pady=(0, 10))
+
+        self.sort_button = Button(self.sort_container,
+                                  text="Sort Table by Chosen Attribute",
+                                  padx=10,
+                                  command=self.sort_button_click_handler)
+        self.sort_button.pack(side=TOP)
+
         self.search_container = Frame(self.button_container)
         self.search_container.pack(side=LEFT, padx=(50, 50))
+
+        self.search_by_label = Label(self.search_container,
+                                     text="Search By:",
+                                     font="Times 16")
+        self.search_by_label.pack(side=TOP, pady=(0, 10))
 
         self.search_by_var = StringVar(self)
         self.search_by_var.set(SEARCH_BY[0])
@@ -65,13 +95,47 @@ class AdminViewConfirmedPropertiesWindow(Frame):
                                   text="Back",
                                   padx=10)
         self.back_button.pack(side=RIGHT, padx=(0, 50))
+
+
+    def sort_button_click_handler(self):
+        sort_attr = self.sort_by_var.get()
+        if sort_attr == SEARCH_BY[0] or sort_attr == SEARCH_BY[1]:
+            self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1) 
+                                   FROM Property LEFT OUTER JOIN Visit
+                                   ON ID=PropertyID
+                                   WHERE IsPublic=1 AND ApprovedBy IS NOT NULL
+                                   GROUP BY Name
+                                   ORDER BY {}""".format(PROP_ATTRS, sort_attr))
+        elif sort_attr == SEARCH_BY[2]:
+            self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1)
+                                   FROM Property LEFT OUTER JOIN Visit
+                                   ON ID=PropertyID
+                                   WHERE IsPublic=1 AND ApprovedBy IS NOT NULL
+                                   GROUP BY Name
+                                   ORDER BY FIELD(PropertyType, \"FARM\", \"GARDEN\", \"ORCHARD\")""".format(PROP_ATTRS))
+        elif sort_attr == SEARCH_BY[3]:
+            self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1)
+                                   FROM Property LEFT OUTER JOIN Visit
+                                   ON ID=PropertyID
+                                   WHERE IsPublic=1
+                                   AND ApprovedBy IS NOT NULL
+                                   GROUP BY Name
+                                   ORDER BY ApprovedBy""".format(PROP_ATTRS))
+        else:
+            self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1) AS AvgRating
+                                   FROM Property LEFT OUTER JOIN Visit
+                                   ON ID=PropertyID 
+                                   WHERE IsPublic=1 AND ApprovedBy IS NOT NULL
+                                   GROUP BY Name
+                                   ORDER BY AvgRating""".format(PROP_ATTRS))
         
-        
-    def populate_table(self):
-        query = "SELECT * FROM Property WHERE IsPublic=1 AND ApprovedBy IS NOT NULL"
+
+    def populate_table(self, query):
+        self.table.delete(*self.table.get_children())
         self.db_cursor.execute(query)
         data = self.db_cursor.fetchall()
         for i in range(len(data)):
-            row = (data[i][1], data[i][5], data[i][6], data[i][7], data[i][2], data[i][8], "Yes" if data[i][4] == 1 else "No", "Yes" if data[i][3] == 1 else "No", data[i][0], data[i][10], 1000)
+            row = (data[i][1], data[i][5], data[i][6], data[i][7], data[i][2], data[i][8], "Yes" if data[i][4] == 1 else "No", "Yes" if data[i][3] == 1 else "No", data[i][0], data[i][10], data[i][11])
             self.table.insert("", i, values=row)
-            
+    
+
