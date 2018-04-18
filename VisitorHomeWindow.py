@@ -129,10 +129,8 @@ class VisitorHomeWindow(Frame):
 		# sends user to view a property details
 		def view_prop_details(self):
 			cur_item = self.tree.focus()
-			self.master.master.propertyName = self.tree.item(cur_item)['text']
 
-			# pass these as a dict maybe
-			self.master.master.app_data = { 'PropertyName' : self.tree.item(cur_item)['text'],
+			app_data = { 'PropertyName' : self.tree.item(cur_item)['text'],
 						'ID' : self.tree.item(cur_item)['values'][0],
 						'Address' : self.tree.item(cur_item)['values'][1],
 						'Size' : self.tree.item(cur_item)['values'][2],
@@ -146,24 +144,27 @@ class VisitorHomeWindow(Frame):
 			}
 
 			# get owner name and email
-			# sql = f"SELECT Owner, Email FROM User INNER JOIN Property ON \
-			# 	   Owner=Username WHERE ID='{self.master.master.app_data['ID']}'"
-			# self.cursor.execute(sql)
-			# owner_deets = self.cursor.fetchall()
-			# self.master.master.app_data['Owner'], self.master.master.app_data['Email'] = owner_deets[0][0], owner_deets[0][1]
+			sql = f"SELECT Owner, Email FROM User INNER JOIN Property ON \
+				   Owner=Username WHERE ID='{app_data['ID']}'"
+			self.cursor.execute(sql)
+			owner_deets = self.cursor.fetchall()
+			app_data['Owner'], app_data['Email'] = owner_deets[0][0], owner_deets[0][1]
 
 			# get what the farm has
-			# sql = f"SELECT ItemName FROM Has INNER JOIN Property ON \
-			# 		ID=PropertyID WHERE ID='{self.master.master.app_data['ID']}'"
-			# self.cursor.execute(sql)
-			# data = self.cursor.fetchall()
-			# self.master.master.app_data['Items'] = [x[0] for x in data]
+			sql = f"SELECT ItemName FROM Has INNER JOIN Property ON \
+					ID=PropertyID WHERE ID='{app_data['ID']}'"
+			self.cursor.execute(sql)
+			data = self.cursor.fetchall()
+			app_data['Items'] = [x[0] for x in data]
 
-			# ViewPropertyDetails.update(d)
+			self.master.master.windows["ViewPropertyDetails"].populate(app_data)
 			self.master.master.show_window("ViewPropertyDetails")
 
 		def logout_go(self):
 			self.master.master.show_window("LoginWindow")
+
+		def visit_hist_go(self):
+			self.master.master.show_window("VisitHistory")
 
 		############
 		#GUI MAKING#
@@ -217,7 +218,8 @@ class VisitorHomeWindow(Frame):
 		self.view_prop_button.pack()
 
 		# View Visit History Button
-		self.view_visit_hist_button = Button(self, text="View Visit History", font="Times12")
+		self.view_visit_hist_button = Button(self, text="View Visit History", font="Times12", \
+											 command=lambda: visit_hist_go(self))
 		self.view_visit_hist_button.pack()
 
 		# Search/Sort By drop down
