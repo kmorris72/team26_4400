@@ -158,6 +158,7 @@ class VisitorHomeWindow(Frame):
 			app_data['Items'] = [x[0] for x in data]
 
 			self.master.master.windows["ViewPropertyDetails"].populate(app_data)
+			self.master.master.windows["ViewPropertyDetails"].which_screen()
 			self.master.master.show_window("ViewPropertyDetails")
 
 		def logout_go(self):

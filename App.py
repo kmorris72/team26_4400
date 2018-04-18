@@ -14,8 +14,7 @@ class App(Tk):
     def __init__(self, *args, **kwargs):
         Tk.__init__(self)
 
-        self.app_data = ""
-        self.propertyName = ""
+        
 
         self.db = sql.connect(host="academic-mysql.cc.gatech.edu",
                               user="cs4400_team_26",
@@ -43,9 +42,6 @@ class App(Tk):
         self.windows[self.curr_window].pack_forget()
         self.windows[window].pack()
         self.curr_window = window
-        
-
-
 
 app = App()
 app.mainloop()
