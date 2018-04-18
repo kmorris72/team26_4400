@@ -74,7 +74,8 @@ class LoginWindow(Frame):
         if data:
             user_type = data[0][3]
             if user_type == USER_TYPES[0]:
-                return
+                self.master.master.windows["AdminViewConfirmedPropertiesWindow"].populate_table()
+                self.master.master.show_window("AdminViewConfirmedPropertiesWindow")
             elif user_type == USER_TYPES[1]:
                 self.master.master.show_window("OwnerRegistrationWindow")
             else:

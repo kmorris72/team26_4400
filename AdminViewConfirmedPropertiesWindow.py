@@ -14,6 +14,8 @@ class AdminViewConfirmedPropertiesWindow(Frame):
     def __init__(self, master, db_cursor):
         Frame.__init__(self, master)
 
+        self.db_cursor = db_cursor
+
         self.welcome_label = Label(self,
                            text="Confirmed Properties:",
                            font="Times 36")
@@ -63,3 +65,13 @@ class AdminViewConfirmedPropertiesWindow(Frame):
                                   text="Back",
                                   padx=10)
         self.back_button.pack(side=RIGHT, padx=(0, 50))
+        
+        
+    def populate_table(self):
+        query = "SELECT * FROM Property WHERE IsPublic=1 AND ApprovedBy IS NOT NULL"
+        self.db_cursor.execute(query)
+        data = self.db_cursor.fetchall()
+        for i in range(len(data)):
+            row = (data[i][1], data[i][5], data[i][6], data[i][7], data[i][2], data[i][8], "Yes" if data[i][4] == 1 else "No", "Yes" if data[i][3] == 1 else "No", data[i][0], data[i][10], 1000)
+            self.table.insert("", i, values=row)
+            

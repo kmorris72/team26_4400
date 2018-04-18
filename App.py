@@ -8,6 +8,10 @@ from AdminViewConfirmedPropertiesWindow import AdminViewConfirmedPropertiesWindo
 from AdminVisitorOverviewWindow import AdminVisitorOverviewWindow
 
 
+# All of the windows that make up the app.
+ALL_WINDOWS = (LoginWindow, OwnerRegistrationWindow, VisitorRegistrationWindow, AdminOwnerOverviewWindow, AdminViewConfirmedPropertiesWindow, AdminVisitorOverviewWindow)
+
+
 class App(Tk):
     def __init__(self):
         Tk.__init__(self)
@@ -24,7 +28,7 @@ class App(Tk):
 
         self.windows = {}
 
-        for W in (LoginWindow, OwnerRegistrationWindow, VisitorRegistrationWindow, AdminOwnerOverviewWindow, AdminViewConfirmedPropertiesWindow, AdminVisitorOverviewWindow):
+        for W in ALL_WINDOWS:
             window = W(container, self.db_cursor)
             self.windows[W.__name__] = window
         
