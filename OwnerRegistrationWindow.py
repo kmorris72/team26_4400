@@ -134,6 +134,7 @@ class OwnerRegistrationWindow(Frame):
         self.prop_type_var = StringVar(self)
         self.prop_type_var.set(PROP_TYPES[0])
         self.prop_type_var.trace("w", self.prop_type_changed_event_handler)
+        
         self.prop_type_drop_down = OptionMenu(self.prop_animal_crop_container,
                                               self.prop_type_var,
                                               *PROP_TYPES)

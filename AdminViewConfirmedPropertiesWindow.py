@@ -2,6 +2,9 @@ from tkinter import *
 from tkinter import ttk
 
 
+# Property types for searching.
+PROP_TYPES = ["FARM", "GARDEN", "ORCHARD"]
+
 # Column names for the data table.
 COLUMN_NAMES = ["Name", "Address", "City", "Zip", "Size", "Type", "Public", "Commercial",
                 "ID", "Verified by", "Avg. Rating"]
@@ -63,6 +66,12 @@ class AdminViewConfirmedPropertiesWindow(Frame):
         self.search_container = Frame(self.button_container)
         self.search_container.pack(side=LEFT, padx=(50, 50))
 
+        self.search_button = Button(self.search_container,
+                                    text="Search Properties",
+                                    padx=10,
+                                    command=self.search_button_click_handler)
+        self.search_button.pack(side=TOP, pady=(0, 10))
+
         self.search_by_label = Label(self.search_container,
                                      text="Search By:",
                                      font="Times 16")
@@ -70,6 +79,7 @@ class AdminViewConfirmedPropertiesWindow(Frame):
 
         self.search_by_var = StringVar(self)
         self.search_by_var.set(SEARCH_BY[0])
+        self.search_by_var.trace("w", self.search_by_var_changed_handler)
 
         self.search_by_drop_down = OptionMenu(self.search_container,
                                               self.search_by_var,
@@ -81,10 +91,12 @@ class AdminViewConfirmedPropertiesWindow(Frame):
                                  width=10)
         self.search_text.pack(side=TOP, pady=(0, 10))
 
-        self.search_button = Button(self.search_container,
-                                    text="Search Properties",
-                                    padx=10)
-        self.search_button.pack(side=TOP)
+        self.search_by_type_var = StringVar(self)
+        self.search_by_type_var.set(PROP_TYPES[0])
+
+        self.search_by_type_drop_down = OptionMenu(self.search_container,
+                                                   self.search_by_type_var,
+                                                   *PROP_TYPES)
 
         self.manage_prop_button = Button(self.button_container,
                                          text="Manage Selected Property",
@@ -95,6 +107,16 @@ class AdminViewConfirmedPropertiesWindow(Frame):
                                   text="Back",
                                   padx=10)
         self.back_button.pack(side=RIGHT, padx=(0, 50))
+
+
+    def search_by_var_changed_handler(self, x, y, z):
+        search_by_var = self.search_by_var.get()
+        if search_by_var == SEARCH_BY[2]:
+            self.search_text.pack_forget()
+            self.search_by_type_drop_down.pack()
+        else:
+            self.search_by_type_drop_down.pack_forget()
+            self.search_text.pack()
 
 
     def sort_button_click_handler(self):
@@ -117,8 +139,7 @@ class AdminViewConfirmedPropertiesWindow(Frame):
             self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1)
                                    FROM Property LEFT OUTER JOIN Visit
                                    ON ID=PropertyID
-                                   WHERE IsPublic=1
-                                   AND ApprovedBy IS NOT NULL
+                                   WHERE IsPublic=1 AND ApprovedBy IS NOT NULL
                                    GROUP BY Name
                                    ORDER BY ApprovedBy""".format(PROP_ATTRS))
         else:
@@ -128,6 +149,42 @@ class AdminViewConfirmedPropertiesWindow(Frame):
                                    WHERE IsPublic=1 AND ApprovedBy IS NOT NULL
                                    GROUP BY Name
                                    ORDER BY AvgRating""".format(PROP_ATTRS))
+
+
+    def search_button_click_handler(self):
+        search_attr = self.search_by_var.get()
+        search_val = self.search_text.get().strip()
+        if search_attr == SEARCH_BY[0]:
+            self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1) 
+                                   FROM Property LEFT OUTER JOIN Visit
+                                   ON ID=PropertyID
+                                   WHERE IsPublic=1 AND ApprovedBy IS NOT NULL AND {}=\"{}\"
+                                   GROUP BY Name""".format(PROP_ATTRS, search_attr, search_val))
+        elif search_attr == SEARCH_BY[1]:
+            self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1)
+                                   FROM Property LEFT OUTER JOIN Visit
+                                   ON ID=PropertyID
+                                   WHERE IsPublic=1 AND ApprovedBy IS NOT NULL AND {}={}
+                                   GROUP BY Name""".format(PROP_ATTRS, search_attr, search_val))
+        elif search_attr == SEARCH_BY[2]:
+            self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1)
+                                   FROM Property LEFT OUTER JOIN Visit
+                                   ON ID=PropertyID
+                                   WHERE IsPublic=1 AND ApprovedBy IS NOT NULL AND PropertyType=\"{}\"
+                                   GROUP BY Name""".format(PROP_ATTRS, self.search_by_type_var.get()))
+        elif search_attr == SEARCH_BY[3]:
+            self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1) AS AvgRating
+                                   FROM Property LEFT OUTER JOIN Visit
+                                   ON ID=PropertyID 
+                                   WHERE IsPublic=1 AND ApprovedBy IS NOT NULL AND ApprovedBy=\"{}\"
+                                   GROUP BY Name""".format(PROP_ATTRS, search_val))
+        else:
+            self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1) AS AvgRating
+                                   FROM Property LEFT OUTER JOIN Visit
+                                   ON ID=PropertyID 
+                                   WHERE IsPublic=1 AND ApprovedBy IS NOT NULL
+                                   GROUP BY Name
+                                   HAVING AvgRating=\"{}\"""".format(PROP_ATTRS, search_val))
         
 
     def populate_table(self, query):
