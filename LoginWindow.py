@@ -77,7 +77,8 @@ class LoginWindow(Frame):
             elif user_type == USER_TYPES[1]:
                 self.master.master.show_window("OwnerRegistrationWindow")
             else:
-                self.master.master.show_window("VisitorRegistrationWindow")
+                self.master.master.windows["ViewPropertyDetails"].set_uname(self.email_text.get()) 
+                self.master.master.show_window("VisitorHomeWindow")
         else:
             messagebox.showinfo("Alert", "Invalid Email/Password Combination")
 
