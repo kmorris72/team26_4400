@@ -7,10 +7,7 @@ from LoginWindow import LoginWindow
 from ViewPropertyDetails import ViewPropertyDetails
 '''
 TODO
-get Visitor ID num and show it on label
-Add "View Property" function
-Add "View Visit History" function
-CURRENTLY DOING
+move functions out of __init__
 '''
 
 ATTRS = 'Name, ID, Street, Size, City, Zip, PropertyType, IsPublic, IsCommercial'
@@ -23,56 +20,57 @@ class VisitorHomeWindow(Frame):
 		# a thing to allow access to DB
 		self.cursor = db_cursor
 
+		self.uname = ""
+
 		#############
 		# FUNCTIONS #
 		#############
 
 		# generate table of tuples
-		def populate_table(self, sql, tree, search_val):
+		# def populate_table(self, sql):
 		
-			# remove all info currently in the table
-			self.tree.delete(*tree.get_children())
+		# 	# remove all info currently in the table
+		# 	self.tree.delete(*self.tree.get_children())
 
-			# How many children deep do we want to put
-			# each tuple of the DB? `count` many
-			count = 0 
+		# 	# How many children deep do we want to put
+		# 	# each tuple of the DB? `count` many
+		# 	count = 0 
 			
-			# This `if` runs after the user presses the `go_button`
-			# and has chosen to either:
-			# else: search by range on Visits or Avg. Rating
-			# if: done any other kind of search or sort.
-			if search_val == "":
+		# 	# This `if` runs after the user presses the `go_button`
+		# 	# and has chosen to either:
+		# 	# else: search by range on Visits or Avg. Rating
+		# 	# if: done any other kind of search or sort.
+		# 	# if search_val == "":
 				
-				# Pass SQL to MySQL
-				self.cursor.execute(sql)
+		# 	# Pass SQL to MySQL
+		# 	self.cursor.execute(sql)
 
-				# retrieve result of our query as tuples
-				# Important! Query return vals should be 
-				# in the same order as the columns.
-				data = self.cursor.fetchall()
+		# 	# retrieve result of our query as tuples
+		# 	# Important! Query return vals should be 
+		# 	# in the same order as the columns.
+		# 	data = self.cursor.fetchall()
 
-				# put our tuple results in the widget. 
-				for tup in data:
+		# 	# put our tuple results in the widget. 
+		# 	for tup in data:
 
-					# Fill in a row of the table with a tuple's values. 
-					self.tree.insert('', count, text=tup[0], values=(tup[1], tup[2], tup[3], tup[4], 
-									 tup[5], tup[6], tup[7], tup[8], tup[9], tup[10]))
-					
-					# Put the next tuple as the child of the one just processed.
-					count += 1
+		# 		# Fill in a row of the table with a tuple's values. 
+		# 		self.tree.insert('', count, text=tup[0], values=(tup[1], tup[2], tup[3], tup[4], 
+		# 						 tup[5], tup[6], tup[7], tup[8], tup[9], tup[10]))
+				
+		# 		# Put the next tuple as the child of the one just processed.
+		# 		count += 1
 			
 			# User is searching (specifying a range) on Visits or Avg. Rating.
-			else:
+			# else:
 
-				# Merge tuples to pair our stats to their property
-				data = cursor.fetchall()
-				print(data)
+			# 	# Merge tuples to pair our stats to their property
+			# 	data = self.cursor.fetchall()
 				
-				for tup in data:
-					self.tree.insert('', count, text=tup[0], values=(tup[1], tup[2], tup[3], tup[4], 
-								 tup[5], tup[6], tup[7], tup[8], tup[9], tup[10]))
+			# 	for tup in data:
+			# 		self.tree.insert('', count, text=tup[0], values=(tup[1], tup[2], tup[3], tup[4], 
+			# 					 tup[5], tup[6], tup[7], tup[8], tup[9], tup[10]))
 				
-					count += 1
+			# 		count += 1
 
 		# Run the sort/search button
 		# Get values to sort and maybe search by
@@ -124,7 +122,7 @@ class VisitorHomeWindow(Frame):
 				sql = f"SELECT {ATTRS}, COUNT(Rating) AS cr, AVG(Rating) FROM Property LEFT OUTER JOIN \
 						Visit ON ID=PropertyID GROUP BY Name ORDER BY cr DESC"
 
-			return populate_table(self, sql, self.tree, search_val="")
+			return populate_table(self, sql)
 
 		# sends user to view a property details
 		def view_prop_details(self):
@@ -172,7 +170,7 @@ class VisitorHomeWindow(Frame):
 		############
 		
 		self.label = Label(self,
-						   text="Nice to see you <Visitor ID>",
+						   text=f"Nice to see you {self.uname}",
 						   font="Times 22")
 
 		# make Tkinter put the widget on the page
@@ -250,4 +248,36 @@ class VisitorHomeWindow(Frame):
 
 		self.sql = f"SELECT {ATTRS}, COUNT(Rating), AVG(Rating) FROM Property LEFT OUTER JOIN \
 				Visit ON ID=PropertyID GROUP BY Name"
-		populate_table(self, self.sql, self.tree, search_val="")
+		self.populate_table(self.sql)
+
+	# passed by LoginWindow
+	def set_uname(self, data):
+		self.uname = data
+
+	# generate table of tuples
+	def populate_table(self, sql):
+	
+		# remove all info currently in the table
+		self.tree.delete(*self.tree.get_children())
+
+		# How many children deep do we want to put
+		# each tuple of the DB? `count` many
+		count = 0 
+		
+		# Pass SQL to MySQL
+		self.cursor.execute(sql)
+
+		# retrieve result of our query as tuples
+		# Important! Query return vals should be 
+		# in the same order as the columns.
+		data = self.cursor.fetchall()
+
+		# put our tuple results in the widget. 
+		for tup in data:
+
+			# Fill in a row of the table with a tuple's values. 
+			self.tree.insert('', count, text=tup[0], values=(tup[1], tup[2], tup[3], tup[4], 
+							 tup[5], tup[6], tup[7], tup[8], tup[9], tup[10]))
+			
+			# Put the next tuple as the child of the one just processed.
+			count += 1
