@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 
-class ownermanagapropertyWindow:
+class OwnerManagePropertyWindow:
     def __init__(self, master):
         self.master = master
         master.title("Unconfirmed Properties")
