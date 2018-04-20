@@ -105,7 +105,8 @@ class AdminViewConfirmedPropertiesWindow(Frame):
 
         self.back_button = Button(self.button_container,
                                   text="Back",
-                                  padx=10)
+                                  padx=10,
+                                  command=self.back_button_clicked_handler)
         self.back_button.pack(side=RIGHT, padx=(0, 50))
 
 
@@ -185,6 +186,15 @@ class AdminViewConfirmedPropertiesWindow(Frame):
                                    WHERE IsPublic=1 AND ApprovedBy IS NOT NULL
                                    GROUP BY Name
                                    HAVING AvgRating=\"{}\"""".format(PROP_ATTRS, search_val))
+
+    
+    def manage_prop_button_clicked_handler(self):
+        table_item = self.table.focus()
+        property_id = self.table.item(table_item)["values"][8]
+
+    
+    def back_button_clicked_handler(self):
+        self.master.master.show_window("LoginWindow")
         
 
     def populate_table(self, query):

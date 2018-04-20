@@ -79,19 +79,27 @@ class LoginWindow(Frame):
         if data:
             user_type = data[0][3]
             if user_type == USER_TYPES[0]:
-                self.master.master.windows["AdminVisitorOverviewWindow"].init_populate_table()
-                self.master.master.show_window("AdminVisitorOverviewWindow")
+                self.master.master.windows["AdminOwnerOverviewWindow"].init_populate_table()
+                self.master.master.show_window("AdminOwnerOverviewWindow")
             elif user_type == USER_TYPES[1]:
                 self.master.master.show_window("OwnerRegistrationWindow")
             else:
                 self.master.master.show_window("VisitorRegistrationWindow")
+            self.clear_text_boxes()
         else:
             messagebox.showinfo("Alert", "Invalid Email/Password Combination")
             
 
     def owner_reg_button_click_handler(self):
+        self.clear_text_boxes()
         self.master.master.show_window("OwnerRegistrationWindow")
 
 
     def visitor_reg_button_click_handler(self):
+        self.clear_text_boxes()
         self.master.master.show_window("VisitorRegistrationWindow")
+
+
+    def clear_text_boxes(self):
+        self.email_text.delete(0, END)
+        self.password_text.delete(0, END)

@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+import tkinter.messagebox as messagebox
 
 
 # Column names for the data table. Also serve as possible "search by" terms.
@@ -42,7 +43,8 @@ class AdminVisitorOverviewWindow(Frame):
 
         self.delete_log_button = Button(self.delete_back_button_container,
                                          text="Delete Log History",
-                                         padx=10)
+                                         padx=10,
+                                         command=self.delete_log_button_clicked_handler)
         self.delete_log_button.pack(pady=(0, 20))
 
         self.back_button = Button(self.delete_back_button_container,
@@ -53,6 +55,11 @@ class AdminVisitorOverviewWindow(Frame):
 
         self.search_container = Frame(self.button_container)
         self.search_container.pack(side=LEFT)
+
+        self.search_by_label = Label(self.search_container,
+                                     text="Search By:",
+                                     font="Times 16")
+        self.search_by_label.pack(side=TOP, pady=(0, 2))
 
         self.search_by_var = StringVar(self)
         self.search_by_var.set(COLUMN_NAMES[0])
@@ -75,12 +82,30 @@ class AdminVisitorOverviewWindow(Frame):
 
 
     def delete_visitor_button_clicked_handler(self):
-        table_item = self.table.focus()
-        visitor_username = self.table.item(table_item)["values"][0]
-        delete_query = """DELETE FROM User
-                          WHERE Username=\"{}\"""".format(visitor_username)
-        self.db_cursor.execute(delete_query)
-        self.table.delete(table_item)
+        should_delete = messagebox.askyesno("Alert", "Do You Really Want to Delete the Selected Visitor?")
+        if should_delete:
+            table_item = self.table.focus()
+            visitor_username = self.table.item(table_item)["values"][0]
+            delete_query = """DELETE FROM User
+                              WHERE Username=\"{}\"""".format(visitor_username)
+            self.db_cursor.execute(delete_query)
+            self.table.delete(table_item)
+            messagebox.showinfo("Alert", "Deleted Selected Visitor.")
+        else:
+            messagebox.showinfo("Alert", "Visitor Not Deleted.")
+
+
+    def delete_log_button_clicked_handler(self):
+        should_delete = messagebox.askyesno("Alert", "Do You Really Want to Delete the Selected Visitor's Visit Log?")
+        if should_delete:
+            table_item = self.table.focus()
+            visitor_username = self.table.item(table_item)["values"][0]
+            delete_query = """DELETE FROM Visit
+                              WHERE Username=\"{}\"""".format(visitor_username)
+            self.db_cursor.execute(delete_query)
+            messagebox.showinfo("Alert", "Deleted Selected Visitor's Visit Log.")
+        else:
+            messagebox.showinfo("Alert", "Visit Log Not Deleted.")
 
     
     def search_button_clicked_handler(self):
@@ -102,8 +127,7 @@ class AdminVisitorOverviewWindow(Frame):
 
 
     def back_button_clicked_handler(self):
-        # self.master.master.show_window()
-        return
+        self.master.master.show_window("LoginWindow")
 
 
     def populate_table(self, query):
