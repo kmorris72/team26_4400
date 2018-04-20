@@ -79,12 +79,8 @@ class LoginWindow(Frame):
         if data:
             user_type = data[0][3]
             if user_type == USER_TYPES[0]:
-                self.master.master.windows["AdminViewConfirmedPropertiesWindow"].populate_table("""SELECT {}, ROUND(AVG(Rating), 1)
-                                                                                                   FROM Property LEFT OUTER JOIN Visit
-                                                                                                   ON ID=PropertyID
-                                                                                                   WHERE IsPublic=1 AND ApprovedBy IS NOT NULL
-                                                                                                   GROUP BY Name""".format(PROP_ATTRS))
-                self.master.master.show_window("AdminViewConfirmedPropertiesWindow")
+                self.master.master.windows["AdminVisitorOverviewWindow"].init_populate_table()
+                self.master.master.show_window("AdminVisitorOverviewWindow")
             elif user_type == USER_TYPES[1]:
                 self.master.master.show_window("OwnerRegistrationWindow")
             else:

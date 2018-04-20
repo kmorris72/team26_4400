@@ -10,6 +10,8 @@ class AdminOwnerOverviewWindow(Frame):
     def __init__(self, master, db_cursor):
         Frame.__init__(self, master)
 
+        self.db_cursor = db_cursor
+
         self.welcome_label = Label(self,
                            text="All Owners in System",
                            font="Times 36")
@@ -62,3 +64,20 @@ class AdminOwnerOverviewWindow(Frame):
                                     text="Search Properties",
                                     padx=10)
         self.search_button.pack(side=TOP)
+
+    
+    def populate_table(self, query):
+        self.table.delete(*self.table.get_children())
+        self.db_cursor.execute(query)
+        data = self.db_cursor.fetchall()
+        for i in range(len(data)):
+            row = (data[i][0], data[i][1], data[i][2])
+            self.table.insert("", i, values=row)
+
+
+    def init_populate_table(self):
+        self.populate_table("""SELECT Username, Email, COUNT(ID)
+                               FROM User AS U LEFT OUTER JOIN Property AS P
+                               ON U.Username=P.Owner
+                               WHERE U.UserType="OWNER"
+                               GROUP BY U.Username""")

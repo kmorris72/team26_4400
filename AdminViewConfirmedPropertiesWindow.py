@@ -196,3 +196,9 @@ class AdminViewConfirmedPropertiesWindow(Frame):
             self.table.insert("", i, values=row)
     
 
+    def init_populate_table(self):
+        self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1)
+                               FROM Property LEFT OUTER JOIN Visit
+                               ON ID=PropertyID
+                               WHERE IsPublic=1 AND ApprovedBy IS NOT NULL
+                               GROUP BY Name""".format(PROP_ATTRS))

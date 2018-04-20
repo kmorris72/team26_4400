@@ -10,6 +10,8 @@ class AdminVisitorOverviewWindow(Frame):
     def __init__(self, master, db_cursor):
         Frame.__init__(self, master)
 
+        self.db_cursor = db_cursor
+
         self.welcome_label = Label(self,
                            text="All Visitors in System",
                            font="Times 36")
@@ -67,3 +69,20 @@ class AdminVisitorOverviewWindow(Frame):
                                     text="Search Properties",
                                     padx=10)
         self.search_button.pack(side=TOP)
+
+
+    def populate_table(self, query):
+        self.table.delete(*self.table.get_children())
+        self.db_cursor.execute(query)
+        data = self.db_cursor.fetchall()
+        for i in range(len(data)):
+            row = (data[i][0], data[i][1], data[i][2])
+            self.table.insert("", i, values=row)
+            
+
+    def init_populate_table(self):
+        self.populate_table("""SELECT U.Username, Email, COUNT(*)
+                               FROM User AS U LEFT OUTER JOIN Visit AS V
+                               ON U.Username=V.Username
+                               WHERE U.UserType="VISITOR"
+                               GROUP BY U.Username""")
