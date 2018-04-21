@@ -37,7 +37,7 @@ class ViewPropertyDetails(Frame):
 			self.type_label, self.has_label]
 			for w in wids:
 				w.config(text="")
-		except: print('failed')
+		except: pass #print('failed')
 
 		self.d = data
 		self.label = Label(self, text=f"{self.d['PropertyName']} Details", font="Times 24")
@@ -89,50 +89,54 @@ class ViewPropertyDetails(Frame):
 
 	# show appropriate screen based on if user has visted the property or not
 	def which_screen(self):
+		self.back_button = Button(self, text="Back", font="Times 12", \
+					command=lambda: self.back_go())
+		self.back_button.grid()
 
 		# check if user has visited the selected property
 		sql = f"SELECT Rating FROM Visit WHERE Username='{self.uname}' AND PropertyID='{self.d['ID']}'"
 		self.cursor.execute(sql)
 		data = self.cursor.fetchall()
-		print(data)
+		#print(data)
 		# program will complain if user has not visited it yet
 		try:
 			if data[0][0] in [1, 2, 3, 4, 5]:
-				print("in if")
+		#		print("in if")
 				# necessary to avoid printing errors on first time
 				# user accesses this screen
 				try:
 					self.rate_label.grid_forget()
 					self.rate_entry.grid_forget()
 					self.log_button.grid_forget()
-					print("i forgot the rating UI")
-				except: print("can't forget rating UI")
+		#			print("i forgot the rating UI")
+				except: pass #print("can't forget rating UI")
 				self.unlog_button = Button(self, text="Un-Log Visit", font="Times 12", \
 							command=lambda: self.unlog_visit())
-				self.unlog_button.grid(row=18, column=0)
+				self.unlog_button.grid()
 		except:
-			print("in except")
+			#print("in except")
 			try:
 				self.unlog_button.grid_forget()
-				print("I forgit the unlog")
-			except: print("can't forget unlog UI")
+			#	print("I forgit the unlog")
+			except: pass # print("can't forget unlog UI")
 			self.rate_label = Label(self, text="Rate Visit:", font="Times 12")
-			self.rate_label.grid(row=15, column=0)
+			self.rate_label.grid()
 
 			self.rate_entry = Entry(self)
 			self.rate_entry.insert(0, "1-5")
-			self.rate_entry.grid(row=16, column=0)
+			self.rate_entry.grid()
 
 			# Buttons
 			self.log_button = Button(self, text="Log Visit", font="Times 12", \
 						command=lambda: self.log_visit(self.rate_entry.get()))
-			self.log_button.grid(row=17, column=0)
-
-		self.back_button = Button(self, text="Back", font="Times 12", \
-					command=lambda: self.back_go())
-		self.back_button.grid(row=19, column=0)
+			self.log_button.grid()
 
 	def back_go(self):
+		self.rate_label.grid_forget()
+		self.rate_entry.grid_forget()
+		self.log_button.grid_forget()
+		self.unlog_button.grid_forget()
+		self.back_button.grid_forget()
 		self.master.master.show_window("VisitorHomeWindow")
 
 	# passed by LoginWindow
@@ -166,8 +170,13 @@ class ViewPropertyDetails(Frame):
 			self.d['Avg Rating'] = data[0][1]
 			self.master.master.windows['ViewPropertyDetails'].grid_forget()
 			self.populate(self.d)
-			self.which_screen()
+			# self.which_screen()
+			self.unlog_button = Button(self, text="Un-Log Visit", font="Times 12", \
+									command=lambda: self.unlog_visit())
+			self.unlog_button.grid()
 			self.master.master.show_window("ViewPropertyDetails")
+
+			# self.master.master.show_window("VisitorHomeWindow")
 
 	def unlog_visit(self):
 		self.unlog_button.grid_forget()
@@ -189,5 +198,15 @@ class ViewPropertyDetails(Frame):
 		self.d['Avg Rating'] = data[0][1]		
 		self.master.master.windows['ViewPropertyDetails'].grid_forget()
 		self.populate(self.d)
-		self.which_screen()
+		# self.which_screen()
+		self.rate_label = Label(self, text="Rate Visit:", font="Times 12")
+		self.rate_label.grid()
+		self.rate_entry = Entry(self)
+		self.rate_entry.insert(0, "1-5")
+		self.rate_entry.grid()
+		self.log_button = Button(self, text="Log Visit", font="Times 12", \
+							command=lambda: self.log_visit(self.rate_entry.get()))
+		self.log_button.grid()
 		self.master.master.show_window("ViewPropertyDetails")
+
+		# self.master.master.show_window("VisitorHomeWindow")
