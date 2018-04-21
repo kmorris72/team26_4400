@@ -1,5 +1,7 @@
 #NOTES:
-#1. Unsure how name of property will be passed in
+#Stuff to do:
+#1. Add the pass in of the property name
+#2. Create path for Back button
 
 from tkinter import *
 import tkinter.messagebox as messagebox
@@ -116,6 +118,13 @@ class PropertyDetailsWindow:
 
 		Label(master, text="Animals:", font="Times 12").grid(row=15,column=0, sticky=E, padx=0)
 		Label(master, text=prop_animal_list, font="Times 12").grid(row=15,column=1, sticky=W, padx=0)
+
+		self.backButton = Button(master, text="Back",
+								command=self.back_event_handler)
+		self.backButton.grid(row=16,column=0, sticky=W+E,columnspan=2)
+
+	def back_event_handler(self):
+		root.destroy()
 
 my_gui = PropertyDetailsWindow(root)
 root.mainloop()
