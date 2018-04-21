@@ -13,7 +13,7 @@ db = sql.connect(host="academic-mysql.cc.gatech.edu",
 
 root = Tk()
 
-phProp = "Kenari Company Farm"
+phProp = "Jacob's Farm"
 class PropertyDetailsWindow:
 	def __init__(self, master):
 		self.db_cursor = db.cursor()
@@ -54,6 +54,8 @@ class PropertyDetailsWindow:
 		avg_rating_query = "SELECT AVG(Rating) FROM Visit WHERE PropertyID =\"{}\"".format(prop_id)
 		self.db_cursor.execute(visits_query)
 		prop_avg_rtg = self.db_cursor.fetchall()[0][0]
+		if prop_visits == 0:
+			prop_avg_rtg = "No Visits Yet"
 
 		crops_query = "SELECT ItemName FROM Has LEFT OUTER JOIN FarmItem ON Has.ItemName=FarmItem.Name WHERE PropertyID =\"{}\" and Type !=\"ANIMAL\"".format(prop_id)
 		self.db_cursor.execute(crops_query)
