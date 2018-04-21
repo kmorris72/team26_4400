@@ -40,6 +40,23 @@ class ViewPropertyDetails(Frame):
 				w.config(text="")
 		except: pass #print('failed')
 
+		# i'm sorry about all of these try except blocks
+		# i know i'm better than this but time is short
+		# and stress is high
+		try:
+			self.rate_label.grid_forget()
+			self.rate_entry.grid_forget()
+			self.log_button.grid_forget()
+		except: pass
+
+		try:
+			self.unlog_button.grid_forget()
+		except: pass
+
+		try:
+			self.back_button.grid_forget()
+		except: pass
+
 		self.d = data
 		self.label = Label(self, text=f"{self.d['PropertyName']} Details", font="Times 24")
 		self.label.grid(row=0, column=0, sticky=W)
@@ -86,13 +103,14 @@ class ViewPropertyDetails(Frame):
 		self.has_label = Label(self, text=f"Has: {self.d['Items']}", font="Times 12")
 		self.has_label.grid(row=14, column=0, sticky=W)
 
+		self.back_button = Button(self, text="Back", font="Times 12", \
+					command=lambda: self.back_go())
+		self.back_button.grid()
+
 	# Functions
 
 	# show appropriate screen based on if user has visted the property or not
 	def which_screen(self):
-		self.back_button = Button(self, text="Back", font="Times 12", \
-					command=lambda: self.back_go())
-		self.back_button.grid()
 
 		# check if user has visited the selected property
 		sql = f"SELECT Rating FROM Visit WHERE Username='{self.uname}' AND PropertyID='{self.d['ID']}'"
@@ -142,6 +160,7 @@ class ViewPropertyDetails(Frame):
 		self.back_button.grid_forget()
 		if (self.from_hist == 1):
 			self.from_hist = 0
+			self.master.master.windows["VisitHistory"].populate()
 			self.master.master.show_window("VisitHistory")
 		else:
 			self.master.master.show_window("VisitorHomeWindow")
@@ -158,7 +177,8 @@ class ViewPropertyDetails(Frame):
 			self.rate_label.grid_forget()
 			self.rate_entry.grid_forget()
 			self.log_button.grid_forget()
-		
+			self.back_button.grid_forget()
+
 			# insert rating
 			sql = f"INSERT INTO Visit VALUES ('{self.uname}', '{self.d['ID']}', '{datetime.datetime.now()}', '{rating}')"
 			self.cursor.execute(sql)
@@ -187,11 +207,13 @@ class ViewPropertyDetails(Frame):
 
 	def unlog_visit(self):
 		self.unlog_button.grid_forget()
+		self.back_button.grid_forget()
 
 		# remove visitor's rating
 		sql = f"DELETE FROM Visit WHERE Username='{self.uname}' AND PropertyID='{self.d['ID']}'"
 		self.cursor.execute(sql)
 
+		# update home window
 		sql = f"SELECT {ATTRS}, COUNT(Rating), AVG(Rating) FROM Property LEFT OUTER JOIN \
 				Visit ON ID=PropertyID GROUP BY Name"
 		self.master.master.windows["VisitorHomeWindow"].populate_table(sql)

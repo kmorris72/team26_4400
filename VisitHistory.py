@@ -83,6 +83,8 @@ class VisitHistory(Frame):
 		self.master.master.show_window("ViewPropertyDetails")
 
 	def back(self):
+		# update history
+		self.populate()
 		self.master.master.show_window("VisitorHomeWindow")
 
 	def populate(self):
