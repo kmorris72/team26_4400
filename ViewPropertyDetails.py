@@ -30,6 +30,15 @@ class ViewPropertyDetails(Frame):
 	# this is necessary to update the widget text after
 	# user has selected a property to view
 	def populate(self, data):
+		try:
+			wids = [self.type_label, self.label, self.name_label, self.owner_label, self.owner_email_label, \
+			self.addr_label, self.city_label, self.zip_label, self.size_label, self.visits_label, \
+			self.avg_rating_label, self.public_label, self.commercial_label, self.id_label, \
+			self.type_label, self.has_label]
+			for w in wids:
+				w.config(text="")
+		except: print('failed')
+
 		self.d = data
 		self.label = Label(self, text=f"{self.d['PropertyName']} Details", font="Times 24")
 		self.label.grid(row=0, column=0, sticky=W)
@@ -40,14 +49,14 @@ class ViewPropertyDetails(Frame):
 		self.owner_label = Label(self, text=f"Owner: {self.d['Owner']}", font="Times 12")
 		self.owner_label.grid(row=2, column=0, sticky=W)
 
-		self.owner_email_laebl = Label(self, text=f"Owner Email: {self.d['Email']}", font="Times 12")
-		self.owner_email_laebl.grid(row=3, column=0, sticky=W)
+		self.owner_email_label = Label(self, text=f"Owner Email: {self.d['Email']}", font="Times 12")
+		self.owner_email_label.grid(row=3, column=0, sticky=W)
 
 		self.addr_label = Label(self, text=f"Address: {self.d['Address']}", font="Times 12")
 		self.addr_label.grid(row=4, column=0, sticky=W)
 
 		self.city_label = Label(self, text=f"City: {self.d['City']}", font="Times 12")
-		self.addr_label.grid(row=5, column=0, sticky=W)
+		self.city_label.grid(row=5, column=0, sticky=W)
 
 		self.zip_label = Label(self, text=f"Zip: {self.d['Zip']}", font="Times 12")
 		self.zip_label.grid(row=6, column=0, sticky=W)
@@ -85,32 +94,34 @@ class ViewPropertyDetails(Frame):
 		sql = f"SELECT Rating FROM Visit WHERE Username='{self.uname}' AND PropertyID='{self.d['ID']}'"
 		self.cursor.execute(sql)
 		data = self.cursor.fetchall()
-
+		print(data)
 		# program will complain if user has not visited it yet
 		try:
 			if data[0][0] in [1, 2, 3, 4, 5]:
-
+				print("in if")
 				# necessary to avoid printing errors on first time
 				# user accesses this screen
 				try:
 					self.rate_label.grid_forget()
 					self.rate_entry.grid_forget()
 					self.log_button.grid_forget()
-				except: pass
+					print("i forgot the rating UI")
+				except: print("can't forget rating UI")
 				self.unlog_button = Button(self, text="Un-Log Visit", font="Times 12", \
 							command=lambda: self.unlog_visit())
-				self.unlog_button.grid(row=15, column=0)
+				self.unlog_button.grid(row=18, column=0)
 		except:
+			print("in except")
 			try:
 				self.unlog_button.grid_forget()
-			except: pass
+				print("I forgit the unlog")
+			except: print("can't forget unlog UI")
 			self.rate_label = Label(self, text="Rate Visit:", font="Times 12")
 			self.rate_label.grid(row=15, column=0)
 
 			self.rate_entry = Entry(self)
 			self.rate_entry.insert(0, "1-5")
 			self.rate_entry.grid(row=16, column=0)
-
 
 			# Buttons
 			self.log_button = Button(self, text="Log Visit", font="Times 12", \
@@ -119,7 +130,7 @@ class ViewPropertyDetails(Frame):
 
 		self.back_button = Button(self, text="Back", font="Times 12", \
 					command=lambda: self.back_go())
-		self.back_button.grid(row=18, column=0)
+		self.back_button.grid(row=19, column=0)
 
 	def back_go(self):
 		self.master.master.show_window("VisitorHomeWindow")
@@ -132,30 +143,51 @@ class ViewPropertyDetails(Frame):
 	def log_visit(self, rating):
 		if int(rating) not in [1, 2, 3, 4, 5]:
 			self.master.master.show_window("ViewPropertyDetails")
-			pass
 		else:
+			self.rate_label.grid_forget()
+			self.rate_entry.grid_forget()
+			self.log_button.grid_forget()
+		
 			# insert rating
 			sql = f"INSERT INTO Visit VALUES ('{self.uname}', '{self.d['ID']}', '{datetime.datetime.now()}', '{rating}')"
 			self.cursor.execute(sql)
 			
 			# update VisitorHomeWindow table
 			sql = f"SELECT {ATTRS}, COUNT(Rating), AVG(Rating) FROM Property LEFT OUTER JOIN \
-					Visit ON ID=PropertyID GROUP BY Name"
+				Visit ON ID=PropertyID GROUP BY Name"
 			self.master.master.windows["VisitorHomeWindow"].populate_table(sql)
 			
-			# Return to VisitorHomeWindow because I don't want to yet bother with
-			# updating the rating stats and refreshing this screen
-			self.master.master.show_window("VisitorHomeWindow")
+			# update property details
+			sql = f"SELECT COUNT(Username), AVG(Rating) FROM Visit WHERE PropertyID='{self.d['ID']}' \
+					AND Username='{self.uname}'"
+			self.cursor.execute(sql)
+			data = self.cursor.fetchall()
+			self.d['Visits'] = data[0][0]
+			self.d['Avg Rating'] = data[0][1]
+			self.master.master.windows['ViewPropertyDetails'].grid_forget()
+			self.populate(self.d)
+			self.which_screen()
+			self.master.master.show_window("ViewPropertyDetails")
 
-	# this works i think
 	def unlog_visit(self):
+		self.unlog_button.grid_forget()
+
 		# remove visitor's rating
 		sql = f"DELETE FROM Visit WHERE Username='{self.uname}' AND PropertyID='{self.d['ID']}'"
 		self.cursor.execute(sql)
 
-		# send user back because I don't want to mess with
-		# updating the property and refreshing this screen at once
 		sql = f"SELECT {ATTRS}, COUNT(Rating), AVG(Rating) FROM Property LEFT OUTER JOIN \
 				Visit ON ID=PropertyID GROUP BY Name"
 		self.master.master.windows["VisitorHomeWindow"].populate_table(sql)
-		self.master.master.show_window("VisitorHomeWindow")
+		
+		# update details screen
+		sql = f"SELECT COUNT(Username), AVG(Rating) FROM Visit WHERE PropertyID='{self.d['ID']}' \
+				AND Username='{self.uname}'"
+		self.cursor.execute(sql)
+		data = self.cursor.fetchall()
+		self.d['Visits'] = data[0][0]
+		self.d['Avg Rating'] = data[0][1]		
+		self.master.master.windows['ViewPropertyDetails'].grid_forget()
+		self.populate(self.d)
+		self.which_screen()
+		self.master.master.show_window("ViewPropertyDetails")

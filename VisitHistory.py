@@ -22,8 +22,9 @@ class VisitHistory(Frame):
 
 		self.tree.displaycolumns = ["Date Logged", "Rating"]
 		cols = ["#0", "Date Logged", "Rating"]
-		for c in cols:
-			self.tree.column(f'{c}', width=75)
+		self.tree.column('#0', width=150)
+		self.tree.column('Date Logged', width=140)
+		self.tree.column('Rating', width=50)
 
 		self.tree.heading("#0", text="Name")
 		self.tree.heading("Date Logged", text="Date Logged")
@@ -99,7 +100,6 @@ class VisitHistory(Frame):
 		# Important! Query return vals should be 
 		# in the same order as the columns.
 		data = self.cursor.fetchall()
-
 		# put our tuple results in the widget. 
 		for tup in data:
 

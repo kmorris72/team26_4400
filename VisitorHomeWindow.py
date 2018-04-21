@@ -27,7 +27,7 @@ class VisitorHomeWindow(Frame):
 		############
 		
 		self.label = Label(self,
-						   text=f"Nice to see you {self.uname}",
+						   text="",
 						   font="Times 22")
 
 		# make Tkinter put the widget on the page
@@ -45,10 +45,17 @@ class VisitorHomeWindow(Frame):
 									'Type', 'Public', 'Commercial', 'Visits', 'Avg Rating']
 
 		# set default column width
-		cols = ['#0', 'ID', 'Street', 'Size', 'City', 'Zip', 
-				'Type', 'Public', 'Commercial', 'Visits', 'Avg Rating']	
-		for c in cols:
-			self.tree.column(f'{c}', width=75)
+		self.tree.column('#0', width=150)
+		self.tree.column('ID', width=10)
+		self.tree.column('Street', width=150)
+		self.tree.column('Size', width=50)
+		self.tree.column('City', width=70)
+		self.tree.column('Zip', width=50)
+		self.tree.column('Type', width=70)
+		self.tree.column('Public', width=50)
+		self.tree.column('Commercial', width=60)
+		self.tree.column('Visits', width=50)
+		self.tree.column('Avg Rating', width=100)
 
 		# Fill the column headers with text.
 		# there's probably a better way to do this.
@@ -222,6 +229,7 @@ class VisitorHomeWindow(Frame):
 		data = self.cursor.fetchall()
 		app_data['Items'] = [x[0] for x in data]
 
+		print(app_data)
 		self.master.master.windows["ViewPropertyDetails"].populate(app_data)
 		self.master.master.windows["ViewPropertyDetails"].which_screen()
 		self.master.master.show_window("ViewPropertyDetails")
@@ -230,5 +238,10 @@ class VisitorHomeWindow(Frame):
 		self.master.master.show_window("LoginWindow")
 
 	def visit_hist_go(self):
+		print(self.uname)
 		self.master.master.windows["VisitHistory"].populate(self.uname)
 		self.master.master.show_window("VisitHistory")
+
+	def set_welcome(self, uname):
+		self.uname = uname
+		self.label.config(text=f"Nice to see you {uname}")
