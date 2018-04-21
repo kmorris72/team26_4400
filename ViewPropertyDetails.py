@@ -26,6 +26,7 @@ class ViewPropertyDetails(Frame):
 		# these are set by functions below
 		self.uname = ""
 		self.d = ""
+		self.from_hist = 0
 
 	# this is necessary to update the widget text after
 	# user has selected a property to view
@@ -132,12 +133,18 @@ class ViewPropertyDetails(Frame):
 			self.log_button.grid()
 
 	def back_go(self):
-		self.rate_label.grid_forget()
-		self.rate_entry.grid_forget()
-		self.log_button.grid_forget()
-		self.unlog_button.grid_forget()
+		try:
+			self.rate_label.grid_forget()
+			self.rate_entry.grid_forget()
+			self.log_button.grid_forget()
+		except:
+			self.unlog_button.grid_forget()
 		self.back_button.grid_forget()
-		self.master.master.show_window("VisitorHomeWindow")
+		if (self.from_hist == 1):
+			self.from_hist = 0
+			self.master.master.show_window("VisitHistory")
+		else:
+			self.master.master.show_window("VisitorHomeWindow")
 
 	# passed by LoginWindow
 	def set_uname(self, data):

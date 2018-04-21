@@ -13,6 +13,7 @@ class VisitHistory(Frame):
 		Frame.__init__(self, master)
 
 		self.cursor = db_cursor
+		self.uname = ""
 
 		self.title = Label(self, text="Your Visit History", font="Times 24")
 		self.title.pack()
@@ -78,14 +79,15 @@ class VisitHistory(Frame):
 
 		self.master.master.windows["ViewPropertyDetails"].populate(app_data)
 		self.master.master.windows["ViewPropertyDetails"].which_screen()
+		self.master.master.windows["ViewPropertyDetails"].from_hist = 1
 		self.master.master.show_window("ViewPropertyDetails")
 
 	def back(self):
 		self.master.master.show_window("VisitorHomeWindow")
 
-	def populate(self, uname):
+	def populate(self):
 		sql = f"SELECT Name, VisitDate, Rating, ID FROM Visit INNER JOIN Property ON PropertyID=ID \
-				WHERE Username='{uname}' GROUP BY Name"
+				WHERE Username='{self.uname}' GROUP BY Name"
 		# remove all info currently in the table
 		self.tree.delete(*self.tree.get_children())
 

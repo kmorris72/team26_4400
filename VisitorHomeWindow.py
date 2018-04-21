@@ -21,7 +21,6 @@ class VisitorHomeWindow(Frame):
 		self.cursor = db_cursor
 
 		self.uname = ""
-
 		############
 		#GUI MAKING#
 		############
@@ -229,7 +228,7 @@ class VisitorHomeWindow(Frame):
 		data = self.cursor.fetchall()
 		app_data['Items'] = [x[0] for x in data]
 
-		print(app_data)
+		#print(app_data)
 		self.master.master.windows["ViewPropertyDetails"].populate(app_data)
 		self.master.master.windows["ViewPropertyDetails"].which_screen()
 		self.master.master.show_window("ViewPropertyDetails")
@@ -238,10 +237,10 @@ class VisitorHomeWindow(Frame):
 		self.master.master.show_window("LoginWindow")
 
 	def visit_hist_go(self):
-		print(self.uname)
-		self.master.master.windows["VisitHistory"].populate(self.uname)
+		#print(self.uname)
+		self.master.master.windows["VisitHistory"].populate()
 		self.master.master.show_window("VisitHistory")
 
 	def set_welcome(self, uname):
 		self.uname = uname
-		self.label.config(text=f"Nice to see you {uname}")
+		self.label.config(text=f"Nice to see you {self.uname}")
