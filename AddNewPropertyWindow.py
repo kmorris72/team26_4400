@@ -106,7 +106,7 @@ class AddNewPropertyWindow:
 	def add_prop_event_handler(self):
 		no_empty_text = True 
 		for entry in (self.propertyName_entry, self.address_entry, self.city_entry, self.zip_entry, 
-			self.acres_entry, self.prop_type_var, self.commercial, self.public):
+			self.acres_entry, self.prop_type_var, self.commercial, self.public, self.crop):
 			if (entry.get().strip()==""):
 				messagebox.showinfo("Alert", "Please fill out all fields.")	
 				no_empty_text = False
@@ -122,14 +122,6 @@ class AddNewPropertyWindow:
 				no_empty_text = False
 				return
 
-		prop_name = self.propertyName_entry.get().strip()
-		duplicate_prop_name = False
-		prop_name_query = "SELECT * FROM Property WHERE Name=\"{}\"".format(prop_name)
-		self.db_cursor.execute(prop_name_query)
-		if self.db_cursor.fetchall():
-			messagebox.showinfo("Alert", "A property with that name already exists.")
-			duplicate_prop_name = True
-
 		prop_size = self.acres_entry.get()
 		bad_size = False
 		try:
@@ -137,6 +129,7 @@ class AddNewPropertyWindow:
 		except:
 			messagebox.showinfo("Alert", "Please make sure that the number of acres is expressed as a decimal number.")
 			bad_size = True
+			return
 		prop_zip = self.zip_entry.get()
 		bad_zip = False
 		try:
@@ -144,11 +137,35 @@ class AddNewPropertyWindow:
 		except:
 			messagebox.showinfo("Alert", "Please make sure that the zip code is expressed as a non-decimal number.")
 			bad_zip = True
+			return
+
+		crop_type = ""
+		if self.prop_type_var.get() != PROP_TYPES[0]:
+			check_crop_type_query = "SELECT Type FROM FarmItem WHERE Name=\"{}\"".format(self.crop.get())
+			self.db_cursor.execute(check_crop_type_query)
+			crop_type = self.db_cursor.fetchall()[0][0]
+			if self.prop_type_var.get() == PROP_TYPES[1]:
+				if crop_type.lower() != "fruit" and crop_type.lower() != "nut":
+					messagebox.showinfo("Alert", "An orchard may only grow fruit or nuts.")
+					return
+			if self.prop_type_var.get() == PROP_TYPES[2]:
+				if crop_type.lower() != "flower" and crop_type.lower() != "vegetable":
+					messagebox.showinfo("Alert", "A farm may only grow flowers or vegetables.")
+					return
+
+		prop_name = self.propertyName_entry.get().strip()
+		duplicate_prop_name = False
+		prop_name_query = "SELECT * FROM Property WHERE Name=\"{}\"".format(prop_name)
+		self.db_cursor.execute(prop_name_query)
+		if self.db_cursor.fetchall():
+			messagebox.showinfo("Alert", "A property with that name already exists.")
+			duplicate_prop_name = True
+			return
 
 		highest_prop_id_query = "SELECT MAX(ID) FROM Property"
 		self.db_cursor.execute(highest_prop_id_query)
 		prop_id = self.db_cursor.fetchall()[0][0] + 1
-		print(prop_id)
+		#print(prop_id)
 
 		is_commercial = 1 if self.commercial.get() == PUB_COMM_VALUES[0] else 0
 		is_public = 1 if self.public.get() == PUB_COMM_VALUES[0] else 0
@@ -165,13 +182,16 @@ class AddNewPropertyWindow:
 			animal_insert_query = "INSERT INTO Has VALUES ({}, \"{}\")".format(prop_id, animal_name)
 			self.db_cursor.execute(animal_insert_query)
 			if self.crop.get().strip() !="":
-				crop_name = self.crop_var.get()
+				crop_name = self.crop.get()
 				crop_insert_query = "INSERT INTO Has VALUES ({}, \"{}\")".format(prop_id, crop_name)
 				self.db_cursor.execute(crop_insert_query)
+				messagebox.showinfo("Success!", "Your property has been added!")
+
 		else:
-			crop_name = self.crop_var.get()
+			crop_name = self.crop.get()
 			crop_insert_query = "INSERT INTO Has VALUES ({}, \"{}\")".format(prop_id, crop_name)
 			self.db_cursor.execute(crop_insert_query)
+			messagebox.showinfo("Success!", "Your property has been added!")
 
 
 my_gui = AddNewPropertyWindow(root)
