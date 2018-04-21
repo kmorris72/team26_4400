@@ -194,7 +194,7 @@ class AdminViewConfirmedPropertiesWindow(Frame):
 
     
     def back_button_clicked_handler(self):
-        self.master.master.show_window("LoginWindow")
+        self.master.master.show_window("AdminHomeWindow")
         
 
     def populate_table(self, query):

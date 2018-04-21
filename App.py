@@ -7,15 +7,19 @@ from AdminOwnerOverviewWindow import AdminOwnerOverviewWindow
 from AdminViewConfirmedPropertiesWindow import AdminViewConfirmedPropertiesWindow
 from AdminVisitorOverviewWindow import AdminVisitorOverviewWindow
 from AdminViewPendingItemsWindow import AdminViewPendingItemsWindow
+from AdminHomeWindow import AdminHomeWindow
 
 
 # All of the windows that make up the app.
-ALL_WINDOWS = (LoginWindow, OwnerRegistrationWindow, VisitorRegistrationWindow, AdminOwnerOverviewWindow, AdminViewConfirmedPropertiesWindow, AdminVisitorOverviewWindow, AdminViewPendingItemsWindow)
+ALL_WINDOWS = (LoginWindow, OwnerRegistrationWindow, VisitorRegistrationWindow, AdminOwnerOverviewWindow, AdminViewConfirmedPropertiesWindow, AdminVisitorOverviewWindow, AdminViewPendingItemsWindow, AdminHomeWindow)
 
 
 class App(Tk):
     def __init__(self, *args, **kwargs):
         Tk.__init__(self)
+
+        # The username of the user who is currently logged in.
+        self.logged_in_user = ""
 
         self.db = sql.connect(host="academic-mysql.cc.gatech.edu",
                               user="cs4400_team_26",

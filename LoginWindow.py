@@ -77,10 +77,11 @@ class LoginWindow(Frame):
         self.db_cursor.execute(query)
         data = self.db_cursor.fetchall()
         if data:
+            self.master.master.logged_in_user = data[0][0]
             user_type = data[0][3]
             if user_type == USER_TYPES[0]:
-                self.master.master.windows["AdminViewPendingItemsWindow"].populate_table()
-                self.master.master.show_window("AdminViewPendingItemsWindow")
+                self.master.master.windows["AdminHomeWindow"].set_label_text()
+                self.master.master.show_window("AdminHomeWindow")
             elif user_type == USER_TYPES[1]:
                 self.master.master.show_window("OwnerRegistrationWindow")
             else:

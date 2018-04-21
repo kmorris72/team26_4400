@@ -85,7 +85,7 @@ class AdminOwnerOverviewWindow(Frame):
 
 
     def back_button_clicked_handler(self):
-        self.master.master.show_window("LoginWindow")
+        self.master.master.show_window("AdminHomeWindow")
 
 
     def search_button_clicked_handler(self):
