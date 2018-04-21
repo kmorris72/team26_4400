@@ -7,18 +7,19 @@ from tkinter import *
 import tkinter.messagebox as messagebox
 import MySQLdb as sql
 
-db = sql.connect(host="academic-mysql.cc.gatech.edu",
-				user="cs4400_team_26", passwd="YFxUWSqD",
-				db="cs4400_team_26")
+#db = sql.connect(host="academic-mysql.cc.gatech.edu",
+#				user="cs4400_team_26", passwd="YFxUWSqD",
+#				db="cs4400_team_26")
 
-root = Tk()
+#root = Tk()
 
 phProp = "Jacob's Farm"
-class PropertyDetailsWindow:
-	def __init__(self, master):
-		self.db_cursor = db.cursor()
-		self.master = master
-		master.title(phProp + " Property Details")
+class PropertyDetailsWindow(Frame):
+	def __init__(self, parent, db_cursor):
+		Frame.__init__(self, parent)
+		self.db_cursor = db_cursor
+		#self.master = master
+		#master.title(phProp + " Property Details")
 
 		prop_detail_query = "SELECT * FROM Property WHERE Name=\"{}\"".format(phProp)
 		self.db_cursor.execute(prop_detail_query)
@@ -74,60 +75,60 @@ class PropertyDetailsWindow:
 		prop_animal_list = prop_animal_list[0:len(prop_animal_list)-2]
 
 
-		Label(master, text=phProp + " Property Details", font="Times 24"). grid(row=0, columnspan=6)
+		Label(self, text=phProp + " Property Details", font="Times 24"). grid(row=0, columnspan=6)
 
-		Label(master, text="Name:", font="Times 12").grid(row=1,column=0, sticky=E, padx=0)
-		Label(master, text=phProp, font="Times 12").grid(row=1,column=1, sticky=W, padx=0)
+		Label(self, text="Name:", font="Times 12").grid(row=1,column=0, sticky=E, padx=0)
+		Label(self, text=phProp, font="Times 12").grid(row=1,column=1, sticky=W, padx=0)
 
-		Label(master, text="Owner:", font="Times 12").grid(row=2,column=0, sticky=E, padx=0)
-		Label(master, text=prop_owner, font="Times 12").grid(row=2,column=1, sticky=W, padx=0)
+		Label(self, text="Owner:", font="Times 12").grid(row=2,column=0, sticky=E, padx=0)
+		Label(self, text=prop_owner, font="Times 12").grid(row=2,column=1, sticky=W, padx=0)
 
-		Label(master, text="Owner Email:", font="Times 12").grid(row=3,column=0, sticky=E, padx=0)
-		Label(master, text=prop_owner_email, font="Times 12").grid(row=3,column=1, sticky=W, padx=0)
+		Label(self, text="Owner Email:", font="Times 12").grid(row=3,column=0, sticky=E, padx=0)
+		Label(self, text=prop_owner_email, font="Times 12").grid(row=3,column=1, sticky=W, padx=0)
 
-		Label(master, text="Visits:", font="Times 12").grid(row=4,column=0, sticky=E, padx=0)
-		Label(master, text=prop_visits, font="Times 12").grid(row=4,column=1, sticky=W, padx=0)
+		Label(self, text="Visits:", font="Times 12").grid(row=4,column=0, sticky=E, padx=0)
+		Label(self, text=prop_visits, font="Times 12").grid(row=4,column=1, sticky=W, padx=0)
 
-		Label(master, text="Address:", font="Times 12").grid(row=5,column=0, sticky=E, padx=0)
-		Label(master, text=prop_address, font="Times 12").grid(row=5,column=1, sticky=W, padx=0)
+		Label(self, text="Address:", font="Times 12").grid(row=5,column=0, sticky=E, padx=0)
+		Label(self, text=prop_address, font="Times 12").grid(row=5,column=1, sticky=W, padx=0)
 
-		Label(master, text="City:", font="Times 12").grid(row=6,column=0, sticky=E, padx=0)
-		Label(master, text=prop_city, font="Times 12").grid(row=6,column=1, sticky=W, padx=0)
+		Label(self, text="City:", font="Times 12").grid(row=6,column=0, sticky=E, padx=0)
+		Label(self, text=prop_city, font="Times 12").grid(row=6,column=1, sticky=W, padx=0)
 
-		Label(master, text="Zip:", font="Times 12").grid(row=7,column=0, sticky=E, padx=0)
-		Label(master, text=prop_zip, font="Times 12").grid(row=7,column=1, sticky=W, padx=0)
+		Label(self, text="Zip:", font="Times 12").grid(row=7,column=0, sticky=E, padx=0)
+		Label(self, text=prop_zip, font="Times 12").grid(row=7,column=1, sticky=W, padx=0)
 
-		Label(master, text="Size (Acres):", font="Times 12").grid(row=8,column=0, sticky=E, padx=0)
-		Label(master, text=prop_size, font="Times 12").grid(row=8,column=1, sticky=W, padx=0)
+		Label(self, text="Size (Acres):", font="Times 12").grid(row=8,column=0, sticky=E, padx=0)
+		Label(self, text=prop_size, font="Times 12").grid(row=8,column=1, sticky=W, padx=0)
 
-		Label(master, text="Avg Rating:", font="Times 12").grid(row=9,column=0, sticky=E, padx=0)
-		Label(master, text=prop_avg_rtg, font="Times 12").grid(row=9,column=1, sticky=W, padx=0)
+		Label(self, text="Avg Rating:", font="Times 12").grid(row=9,column=0, sticky=E, padx=0)
+		Label(self, text=prop_avg_rtg, font="Times 12").grid(row=9,column=1, sticky=W, padx=0)
 
-		Label(master, text="Type:", font="Times 12").grid(row=10,column=0, sticky=E, padx=0)
-		Label(master, text=prop_type, font="Times 12").grid(row=10,column=1, sticky=W, padx=0)
+		Label(self, text="Type:", font="Times 12").grid(row=10,column=0, sticky=E, padx=0)
+		Label(self, text=prop_type, font="Times 12").grid(row=10,column=1, sticky=W, padx=0)
 
-		Label(master, text="Public:", font="Times 12").grid(row=11,column=0, sticky=E, padx=0)
-		Label(master, text=prop_public, font="Times 12").grid(row=11,column=1, sticky=W, padx=0)
+		Label(self, text="Public:", font="Times 12").grid(row=11,column=0, sticky=E, padx=0)
+		Label(self, text=prop_public, font="Times 12").grid(row=11,column=1, sticky=W, padx=0)
 
-		Label(master, text="Commercial:", font="Times 12").grid(row=12,column=0, sticky=E, padx=0)
-		Label(master, text=prop_commercial, font="Times 12").grid(row=12,column=1, sticky=W, padx=0)
+		Label(self, text="Commercial:", font="Times 12").grid(row=12,column=0, sticky=E, padx=0)
+		Label(self, text=prop_commercial, font="Times 12").grid(row=12,column=1, sticky=W, padx=0)
 
-		Label(master, text="ID:", font="Times 12").grid(row=13,column=0, sticky=E, padx=0)
-		Label(master, text=prop_id, font="Times 12").grid(row=13,column=1, sticky=W, padx=0)
+		Label(self, text="ID:", font="Times 12").grid(row=13,column=0, sticky=E, padx=0)
+		Label(self, text=prop_id, font="Times 12").grid(row=13,column=1, sticky=W, padx=0)
 
-		Label(master, text="Crops:", font="Times 12").grid(row=14,column=0, sticky=E, padx=0)
-		Label(master, text=prop_crop_list, font="Times 12").grid(row=14,column=1, sticky=W, padx=0)
+		Label(self, text="Crops:", font="Times 12").grid(row=14,column=0, sticky=E, padx=0)
+		Label(self, text=prop_crop_list, font="Times 12").grid(row=14,column=1, sticky=W, padx=0)
 
-		Label(master, text="Animals:", font="Times 12").grid(row=15,column=0, sticky=E, padx=0)
-		Label(master, text=prop_animal_list, font="Times 12").grid(row=15,column=1, sticky=W, padx=0)
+		Label(self, text="Animals:", font="Times 12").grid(row=15,column=0, sticky=E, padx=0)
+		Label(self, text=prop_animal_list, font="Times 12").grid(row=15,column=1, sticky=W, padx=0)
 
-		self.backButton = Button(master, text="Back",
+		self.backButton = Button(self, text="Back",
 								command=self.back_event_handler)
 		self.backButton.grid(row=16,column=0, sticky=W+E,columnspan=2)
 
 	def back_event_handler(self):
 		root.destroy()
 
-my_gui = PropertyDetailsWindow(root)
-root.mainloop()
+#my_gui = PropertyDetailsWindow(root)
+#root.mainloop()
 
