@@ -56,23 +56,49 @@ class AdminVisitorOverviewWindow(Frame):
         self.search_container = Frame(self.button_container)
         self.search_container.pack(side=LEFT)
 
-        self.search_by_label = Label(self.search_container,
+        self.search_container_inner = Frame(self.search_container)
+        self.search_container_inner.pack()
+
+        self.search_by_label = Label(self.search_container_inner,
                                      text="Search By:",
                                      font="Times 16")
         self.search_by_label.pack(side=TOP, pady=(0, 2))
 
         self.search_by_var = StringVar(self)
         self.search_by_var.set(COLUMN_NAMES[0])
+        self.search_by_var.trace("w", self.search_by_var_changed_handler)
 
-        self.search_by_drop_down = OptionMenu(self.search_container,
+        self.search_by_drop_down = OptionMenu(self.search_container_inner,
                                               self.search_by_var,
                                               *COLUMN_NAMES)
         self.search_by_drop_down.pack(side=TOP, pady=(0, 10))
 
-        self.search_text = Entry(self.search_container,
+        self.search_text = Entry(self.search_container_inner,
                                  font="Times 16",
                                  width=10)
         self.search_text.pack(side=TOP, pady=(0, 10))
+
+        self.num_visits_search_container = Frame(self.search_container_inner)
+
+        self.num_visits_low_label = Label(self.num_visits_search_container,
+                                        text="Lower End of Range:",
+                                        font="Times 16")
+        self.num_visits_low_label.pack()
+
+        self.num_visits_range_low_text = Entry(self.num_visits_search_container,
+                                             font="Times 16",
+                                             width=10)
+        self.num_visits_range_low_text.pack(pady=(0, 10))
+
+        self.num_visits_high_label = Label(self.num_visits_search_container,
+                                        text="Higher End of Range:",
+                                        font="Times 16")
+        self.num_visits_high_label.pack()
+
+        self.num_visits_range_high_text = Entry(self.num_visits_search_container,
+                                             font="Times 16",
+                                             width=10)
+        self.num_visits_range_high_text.pack(pady=(0, 10))
 
         self.search_button = Button(self.search_container,
                                     text="Search Visitors",
@@ -107,23 +133,37 @@ class AdminVisitorOverviewWindow(Frame):
         else:
             messagebox.showinfo("Alert", "Visit Log Not Deleted.")
 
+
+    def search_by_var_changed_handler(self, x, y, z):
+        if self.search_by_var.get() == COLUMN_NAMES[0] or self.search_by_var.get() == COLUMN_NAMES[1]:
+            self.num_visits_search_container.pack_forget()
+            self.search_text.pack()
+        else:
+            self.search_text.pack_forget()
+            self.num_visits_search_container.pack()
+
     
     def search_button_clicked_handler(self):
         search_attr = self.search_by_var.get()
-        search_val = self.search_text.get()
         if search_attr == COLUMN_NAMES[0] or search_attr == COLUMN_NAMES[1]:
+            search_val = self.search_text.get()
             self.populate_table("""SELECT U.Username, Email, COUNT(*) 
                                    FROM User AS U LEFT OUTER JOIN Visit as V
                                    ON U.Username=V.Username
                                    WHERE U.UserType="VISITOR" AND U.{}=\"{}\"
                                    GROUP BY U.Username""".format(search_attr, search_val))
         else:
-            self.populate_table("""SELECT U.Username, Email, COUNT(*) as VisitCount
-                                   FROM User AS U LEFT OUTER JOIN Visit as V
-                                   ON U.Username=V.Username
-                                   WHERE U.UserType="VISITOR"
-                                   GROUP BY U.Username
-                                   HAVING VisitCount={}""".format(search_val))
+            try:
+                lower_bound = int(self.num_visits_range_low_text.get())
+                upper_bound = int(self.num_visits_range_high_text.get())
+                self.populate_table("""SELECT U.Username, Email, COUNT(*) as VisitCount
+                                       FROM User AS U LEFT OUTER JOIN Visit as V
+                                       ON U.Username=V.Username
+                                       WHERE U.UserType="VISITOR"
+                                       GROUP BY U.Username
+                                       HAVING VisitCount>={} AND VisitCount<={}""".format(lower_bound, upper_bound))
+            except:
+                messagebox.showinfo("Alert", "Please Enter Numbers for the Bounds for Logged Visits.")
 
 
     def back_button_clicked_handler(self):

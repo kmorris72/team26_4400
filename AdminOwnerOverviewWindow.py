@@ -50,24 +50,50 @@ class AdminOwnerOverviewWindow(Frame):
         self.search_container = Frame(self.button_container)
         self.search_container.pack(side=LEFT)
 
+        self.search_container_inner = Frame(self.search_container)
+        self.search_container_inner.pack()
+
         self.search_by_var = StringVar(self)
         self.search_by_var.set(COLUMN_NAMES[0])
+        self.search_by_var.trace("w", self.search_by_var_changed_handler)
 
-        self.search_by_drop_down = OptionMenu(self.search_container,
+        self.search_by_drop_down = OptionMenu(self.search_container_inner,
                                               self.search_by_var,
                                               *COLUMN_NAMES)
         self.search_by_drop_down.pack(side=TOP, pady=(0, 10))
 
-        self.search_text = Entry(self.search_container,
+        self.search_text = Entry(self.search_container_inner,
                                  font="Times 16",
                                  width=10)
         self.search_text.pack(side=TOP, pady=(0, 10))
+
+        self.num_prop_search_container = Frame(self.search_container_inner)
+
+        self.num_prop_low_label = Label(self.num_prop_search_container,
+                                        text="Lower End of Range:",
+                                        font="Times 16")
+        self.num_prop_low_label.pack()
+
+        self.num_prop_range_low_text = Entry(self.num_prop_search_container,
+                                             font="Times 16",
+                                             width=10)
+        self.num_prop_range_low_text.pack(pady=(0, 10))
+
+        self.num_prop_high_label = Label(self.num_prop_search_container,
+                                        text="Higher End of Range:",
+                                        font="Times 16")
+        self.num_prop_high_label.pack()
+
+        self.num_prop_range_high_text = Entry(self.num_prop_search_container,
+                                             font="Times 16",
+                                             width=10)
+        self.num_prop_range_high_text.pack(pady=(0, 10))
 
         self.search_button = Button(self.search_container,
                                     text="Search Properties",
                                     padx=10,
                                     command=self.search_button_clicked_handler)
-        self.search_button.pack(side=TOP)
+        self.search_button.pack(side=TOP, pady=(10, 0))
 
 
     def delete_owner_button_clicked_handler(self):
@@ -88,22 +114,36 @@ class AdminOwnerOverviewWindow(Frame):
         self.master.master.show_window("AdminHomeWindow")
 
 
+    def search_by_var_changed_handler(self, x, y, z):
+        if self.search_by_var.get() == COLUMN_NAMES[0] or self.search_by_var.get() == COLUMN_NAMES[1]:
+            self.num_prop_search_container.pack_forget()
+            self.search_text.pack()
+        else:
+            self.search_text.pack_forget()
+            self.num_prop_search_container.pack()
+
+
     def search_button_clicked_handler(self):
         search_attr = self.search_by_var.get()
-        search_val = self.search_text.get()
         if search_attr == COLUMN_NAMES[0] or search_attr == COLUMN_NAMES[1]:
+            search_val = self.search_text.get()
             self.populate_table("""SELECT Username, Email, COUNT(ID)
-                               FROM User AS U LEFT OUTER JOIN Property AS P
-                               ON U.Username=P.Owner
-                               WHERE U.UserType="OWNER" AND U.{}=\"{}\"
-                               GROUP BY U.Username""".format(search_attr, search_val))
+                                   FROM User AS U LEFT OUTER JOIN Property AS P
+                                   ON U.Username=P.Owner
+                                   WHERE U.UserType="OWNER" AND U.{}=\"{}\"
+                                   GROUP BY U.Username""".format(search_attr, search_val))
         else:
-            self.populate_table("""SELECT Username, Email, COUNT(ID) as PropCount
-                               FROM User AS U LEFT OUTER JOIN Property AS P
-                               ON U.Username=P.Owner
-                               WHERE U.UserType="OWNER"
-                               GROUP BY U.Username
-                               HAVING PropCount={}""".format(search_val))
+            try:
+                lower_bound = int(self.num_prop_range_low_text.get())
+                upper_bound = int(self.num_prop_range_high_text.get())
+                self.populate_table("""SELECT Username, Email, COUNT(ID) as PropCount
+                                       FROM User AS U LEFT OUTER JOIN Property AS P
+                                       ON U.Username=P.Owner
+                                       WHERE U.UserType="OWNER"
+                                       GROUP BY U.Username
+                                       HAVING PropCount>={} AND PropCount<={}""".format(lower_bound, upper_bound))
+            except:
+                messagebox.showinfo("Alert", "Please Enter Numbers for the Bounds for Number of Properties.")
 
     
     def populate_table(self, query):

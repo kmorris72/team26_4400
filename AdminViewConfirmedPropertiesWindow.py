@@ -176,7 +176,7 @@ class AdminViewConfirmedPropertiesWindow(Frame):
         elif search_attr == SEARCH_BY[3]:
             self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1) AS AvgRating
                                    FROM Property LEFT OUTER JOIN Visit
-                                   ON ID=PropertyID 
+                                   ON ID=PropertyID
                                    WHERE IsPublic=1 AND ApprovedBy IS NOT NULL AND ApprovedBy=\"{}\"
                                    GROUP BY Name""".format(PROP_ATTRS, search_val))
         else:

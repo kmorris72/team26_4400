@@ -8,10 +8,13 @@ from AdminViewConfirmedPropertiesWindow import AdminViewConfirmedPropertiesWindo
 from AdminVisitorOverviewWindow import AdminVisitorOverviewWindow
 from AdminViewPendingItemsWindow import AdminViewPendingItemsWindow
 from AdminHomeWindow import AdminHomeWindow
+from AdminViewApprovedItemsWindow import AdminViewApprovedItemsWindow
+from AdminViewUnconfirmedPropertiesWindow import AdminViewUnconfirmedPropertiesWindow
+from AdminManagePropertyWindow import AdminManagePropertyWindow
 
 
 # All of the windows that make up the app.
-ALL_WINDOWS = (LoginWindow, OwnerRegistrationWindow, VisitorRegistrationWindow, AdminOwnerOverviewWindow, AdminViewConfirmedPropertiesWindow, AdminVisitorOverviewWindow, AdminViewPendingItemsWindow, AdminHomeWindow)
+ALL_WINDOWS = (LoginWindow, OwnerRegistrationWindow, VisitorRegistrationWindow, AdminOwnerOverviewWindow, AdminViewConfirmedPropertiesWindow, AdminVisitorOverviewWindow, AdminViewPendingItemsWindow, AdminHomeWindow, AdminViewApprovedItemsWindow, AdminViewUnconfirmedPropertiesWindow, AdminManagePropertyWindow)
 
 
 class App(Tk):
