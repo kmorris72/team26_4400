@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+import tkinter.messagebox as messagebox
 
 
 # Property types for searching.
@@ -13,7 +14,7 @@ COLUMN_NAMES = ["Name", "Address", "City", "Zip", "Size", "Type", "Public", "Com
 SEARCH_BY = ["Name", "Zip", "Type", "Verified by", "Avg. Rating"]
 
 # The attributes of a property as a string (used for queries).
-PROP_ATTRS = "ID, Name, Size, IsCommercial, IsPublic, Street, City, Zip, PropertyType, Owner, ApprovedBy"
+PROP_ATTRS = "Name, Street, City, Zip, Size, PropertyType, IsPublic, IsCommercial, ID, ApprovedBy"
 
 
 class AdminViewConfirmedPropertiesWindow(Frame):
@@ -66,13 +67,10 @@ class AdminViewConfirmedPropertiesWindow(Frame):
         self.search_container = Frame(self.button_container)
         self.search_container.pack(side=LEFT, padx=(50, 50))
 
-        self.search_button = Button(self.search_container,
-                                    text="Search Properties",
-                                    padx=10,
-                                    command=self.search_button_click_handler)
-        self.search_button.pack(side=TOP, pady=(0, 10))
+        self.search_container_inner = Frame(self.search_container)
+        self.search_container_inner.pack()
 
-        self.search_by_label = Label(self.search_container,
+        self.search_by_label = Label(self.search_container_inner,
                                      text="Search By:",
                                      font="Times 16")
         self.search_by_label.pack(side=TOP, pady=(0, 10))
@@ -81,12 +79,12 @@ class AdminViewConfirmedPropertiesWindow(Frame):
         self.search_by_var.set(SEARCH_BY[0])
         self.search_by_var.trace("w", self.search_by_var_changed_handler)
 
-        self.search_by_drop_down = OptionMenu(self.search_container,
+        self.search_by_drop_down = OptionMenu(self.search_container_inner,
                                               self.search_by_var,
                                               *SEARCH_BY)
         self.search_by_drop_down.pack(side=TOP, pady=(0, 10))
 
-        self.search_text = Entry(self.search_container,
+        self.search_text = Entry(self.search_container_inner,
                                  font="Times 16",
                                  width=10)
         self.search_text.pack(side=TOP, pady=(0, 10))
@@ -94,9 +92,37 @@ class AdminViewConfirmedPropertiesWindow(Frame):
         self.search_by_type_var = StringVar(self)
         self.search_by_type_var.set(PROP_TYPES[0])
 
-        self.search_by_type_drop_down = OptionMenu(self.search_container,
+        self.search_by_type_drop_down = OptionMenu(self.search_container_inner,
                                                    self.search_by_type_var,
                                                    *PROP_TYPES)
+
+        self.avg_rat_container = Frame(self.search_container_inner)
+
+        self.avg_rat_low_end_label = Label(self.avg_rat_container,
+                                           text="Lower End of Range:",
+                                           font="Times 16")
+        self.avg_rat_low_end_label.pack(pady=(0, 10))
+
+        self.avg_rat_low_end_text = Entry(self.avg_rat_container,
+                                          font="Times 16",
+                                          width=10)
+        self.avg_rat_low_end_text.pack(pady=(0, 10))
+
+        self.avg_rat_high_end_label = Label(self.avg_rat_container,
+                                           text="Higher End of Range:",
+                                           font="Times 16")
+        self.avg_rat_high_end_label.pack(pady=(0, 10))
+
+        self.avg_rat_high_end_text = Entry(self.avg_rat_container,
+                                          font="Times 16",
+                                          width=10)
+        self.avg_rat_high_end_text.pack(pady=(0, 10))
+
+        self.search_button = Button(self.search_container,
+                                    text="Search Properties",
+                                    padx=10,
+                                    command=self.search_button_click_handler)
+        self.search_button.pack(side=TOP, pady=(10, 10))
 
         self.manage_prop_button = Button(self.button_container,
                                          text="Manage Selected Property",
@@ -114,9 +140,15 @@ class AdminViewConfirmedPropertiesWindow(Frame):
         search_by_var = self.search_by_var.get()
         if search_by_var == SEARCH_BY[2]:
             self.search_text.pack_forget()
+            self.avg_rat_container.pack_forget()
             self.search_by_type_drop_down.pack()
+        elif search_by_var == SEARCH_BY[4]:
+            self.search_text.pack_forget()
+            self.search_by_type_drop_down.pack_forget()
+            self.avg_rat_container.pack()
         else:
             self.search_by_type_drop_down.pack_forget()
+            self.avg_rat_container.pack_forget()
             self.search_text.pack()
 
 
@@ -125,7 +157,7 @@ class AdminViewConfirmedPropertiesWindow(Frame):
         if sort_attr == SEARCH_BY[0] or sort_attr == SEARCH_BY[1]:
             self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1) 
                                    FROM Property LEFT OUTER JOIN Visit
-                                   ON ID=PropertyID
+                                   ON IDA=PropertyID
                                    WHERE IsPublic=1 AND ApprovedBy IS NOT NULL
                                    GROUP BY Name
                                    ORDER BY {}""".format(PROP_ATTRS, sort_attr))
@@ -180,12 +212,17 @@ class AdminViewConfirmedPropertiesWindow(Frame):
                                    WHERE IsPublic=1 AND ApprovedBy IS NOT NULL AND ApprovedBy=\"{}\"
                                    GROUP BY Name""".format(PROP_ATTRS, search_val))
         else:
-            self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1) AS AvgRating
-                                   FROM Property LEFT OUTER JOIN Visit
-                                   ON ID=PropertyID 
-                                   WHERE IsPublic=1 AND ApprovedBy IS NOT NULL
-                                   GROUP BY Name
-                                   HAVING AvgRating=\"{}\"""".format(PROP_ATTRS, search_val))
+            try:
+                lower_bound = float(self.avg_rat_low_end_text.get())
+                upper_bound = float(self.avg_rat_high_end_text.get())
+                self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1) AS AvgRating
+                                       FROM Property LEFT OUTER JOIN Visit
+                                       ON ID=PropertyID 
+                                       WHERE IsPublic=1 AND ApprovedBy IS NOT NULL
+                                       GROUP BY Name
+                                       HAVING AvgRating>={} AND AvgRating<={}""".format(PROP_ATTRS, lower_bound, upper_bound))
+            except:
+                messagebox.showinfo("Alert", "Please Enter Numbers for the Bounds for the Average Rating.")
 
     
     def manage_prop_button_clicked_handler(self):
@@ -202,7 +239,7 @@ class AdminViewConfirmedPropertiesWindow(Frame):
         self.db_cursor.execute(query)
         data = self.db_cursor.fetchall()
         for i in range(len(data)):
-            row = (data[i][1], data[i][5], data[i][6], data[i][7], data[i][2], data[i][8], "Yes" if data[i][4] == 1 else "No", "Yes" if data[i][3] == 1 else "No", data[i][0], data[i][10], data[i][11])
+            row = (data[i][0], data[i][1], data[i][2], data[i][3], data[i][4], data[i][5], "Yes" if data[i][6] == 1 else "No", "Yes" if data[i][7] == 1 else "No", data[i][8], data[i][9], data[i][10])
             self.table.insert("", i, values=row)
     
 
