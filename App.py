@@ -6,10 +6,11 @@ from VisitorRegistrationWindow import VisitorRegistrationWindow
 from AdminOwnerOverviewWindow import AdminOwnerOverviewWindow
 from AdminViewConfirmedPropertiesWindow import AdminViewConfirmedPropertiesWindow
 from AdminVisitorOverviewWindow import AdminVisitorOverviewWindow
+from AdminViewPendingItemsWindow import AdminViewPendingItemsWindow
 
 
 # All of the windows that make up the app.
-ALL_WINDOWS = (LoginWindow, OwnerRegistrationWindow, VisitorRegistrationWindow, AdminOwnerOverviewWindow, AdminViewConfirmedPropertiesWindow, AdminVisitorOverviewWindow)
+ALL_WINDOWS = (LoginWindow, OwnerRegistrationWindow, VisitorRegistrationWindow, AdminOwnerOverviewWindow, AdminViewConfirmedPropertiesWindow, AdminVisitorOverviewWindow, AdminViewPendingItemsWindow)
 
 
 class App(Tk):
