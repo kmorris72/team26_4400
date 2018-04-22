@@ -110,6 +110,7 @@ class OwnerWelcomeWindow(Frame):
                                           width=10)
         self.avg_rat_low_end_text.pack(pady=(0, 10))
 
+
         self.avg_rat_high_end_label = Label(self.avg_rat_container,
                                            text="Higher End of Range:",
                                            font="Times 16")
@@ -119,6 +120,31 @@ class OwnerWelcomeWindow(Frame):
                                           font="Times 16",
                                           width=10)
         self.avg_rat_high_end_text.pack(pady=(0, 10))
+
+
+        self.vis_container = Frame(self.search_container_inner)
+
+        self.vis_low_end_label = Label(self.vis_container,
+                                           text="Lower End of Range:",
+                                           font="Times 16")
+        self.vis_low_end_label.pack(pady=(0, 10))
+
+        self.vis_low_end_text = Entry(self.vis_container,
+                                          font="Times 16",
+                                          width=10)
+        self.vis_low_end_text.pack(pady=(0, 10))
+
+
+        self.vis_high_end_label = Label(self.vis_container,
+                                           text="Higher End of Range:",
+                                           font="Times 16")
+        self.vis_high_end_label.pack(pady=(0, 10))
+
+        self.vis_high_end_text = Entry(self.vis_container,
+                                          font="Times 16",
+                                          width=10)
+        self.vis_high_end_text.pack(pady=(0, 10))
+
 
         self.search_button = Button(self.search_container,
                                     text="Search Properties",
@@ -151,12 +177,20 @@ class OwnerWelcomeWindow(Frame):
         if search_by_var == SEARCH_BY[2]:
             self.search_text.pack_forget()
             self.avg_rat_container.pack_forget()
+            self.vis_container.pack_forget()
             self.search_by_type_drop_down.pack()
         elif search_by_var == SEARCH_BY[4]:
             self.search_text.pack_forget()
+            self.vis_container.pack_forget()
             self.search_by_type_drop_down.pack_forget()
             self.avg_rat_container.pack()
+        elif search_by_var == SEARCH_BY[3]:
+            self.search_text.pack_forget()
+            self.search_by_type_drop_down.pack_forget()
+            self.avg_rat_container.pack_forget()
+            self.vis_container.pack()
         else:
+            self.vis_container.pack_forget()
             self.search_by_type_drop_down.pack_forget()
             self.avg_rat_container.pack_forget()
             self.search_text.pack()
@@ -165,28 +199,28 @@ class OwnerWelcomeWindow(Frame):
     def sort_button_click_handler(self):
         sort_attr = self.sort_by_var.get()
         if sort_attr == SEARCH_BY[0] or sort_attr == SEARCH_BY[1]:
-            self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1) AS AvgRating, COUNT(*) AS Visits
+            self.populate_table("""SELECT {}, ROUND(AVG(IFNULL(Rating,0)), 1) AS AvgRating, COUNT(Rating) AS Visits
                                    FROM Property LEFT OUTER JOIN Visit
                                    ON ID=PropertyID
                                    WHERE Owner = \"{}\" 
                                    GROUP BY Name
                                    ORDER BY {}""".format(PROP_ATTRS, self.nameofowner, sort_attr))
         elif sort_attr == SEARCH_BY[2]:
-            self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1) AS AvgRating, COUNT(*) AS Visits
+            self.populate_table("""SELECT {}, ROUND(AVG(IFNULL(Rating,0)), 1) AS AvgRating, COUNT(Rating) AS Visits
                                    FROM Property LEFT OUTER JOIN Visit
                                    ON ID=PropertyID
                                    WHERE Owner = \"{}\"
                                    GROUP BY Name
                                    ORDER BY FIELD(PropertyType, \"FARM\", \"GARDEN\", \"ORCHARD\")""".format(PROP_ATTRS, self.nameofowner))
         elif sort_attr == SEARCH_BY[3]:
-            self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1) AS AvgRating, COUNT(*) AS Visits
+            self.populate_table("""SELECT {}, ROUND(AVG(IFNULL(Rating,0)), 1) AS AvgRating, COUNT(Rating) AS Visits
                                    FROM Property LEFT OUTER JOIN Visit
                                    ON ID=PropertyID
                                    WHERE Owner = \"{}\"
                                    GROUP BY Name
                                    ORDER BY Visits""".format(PROP_ATTRS, self.nameofowner))
         else:
-            self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1) AS AvgRating, COUNT(*) AS Visits
+            self.populate_table("""SELECT {}, ROUND(AVG(IFNULL(Rating,0)), 1) AS AvgRating, COUNT(Rating) AS Visits
                                    FROM Property LEFT OUTER JOIN Visit
                                    ON ID=PropertyID
                                    WHERE Owner = \"{}\"
@@ -198,35 +232,38 @@ class OwnerWelcomeWindow(Frame):
         search_attr = self.search_by_var.get()
         search_val = self.search_text.get().strip()
         if search_attr == SEARCH_BY[0]:
-            self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1) AS AvgRating, COUNT(*) AS Visits
+            self.populate_table("""SELECT {}, ROUND(AVG(IFNULL(Rating,0)), 1) AS AvgRating, COUNT(Rating) AS Visits
                                    FROM Property LEFT OUTER JOIN Visit
                                    ON ID=PropertyID  
                                    WHERE Owner = \"{}\" AND {}=\"{}\"
                                    GROUP BY Name""".format(PROP_ATTRS, self.nameofowner, search_attr, search_val))
         elif search_attr == SEARCH_BY[1]:
-            self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1) AS AvgRating, COUNT(*) AS Visits
+            self.populate_table("""SELECT {}, ROUND(AVG(IFNULL(Rating,0)), 1) AS AvgRating, COUNT(Rating) AS Visits
                                    FROM Property LEFT OUTER JOIN Visit
                                    ON ID=PropertyID
                                    WHERE Owner = \"{}\" AND {}=\"{}\"
                                    GROUP BY Zip""".format(PROP_ATTRS, self.nameofowner, search_attr, search_val))
         elif search_attr == SEARCH_BY[2]:
-            self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1) AS AvgRating, COUNT(*) AS Visits
+            self.populate_table("""SELECT {}, ROUND(AVG(IFNULL(Rating,0)), 1) AS AvgRating, COUNT(Rating) AS Visits
                                    FROM Property LEFT OUTER JOIN Visit
                                    ON ID=PropertyID
                                    WHERE Owner = \"{}\" AND PropertyType=\"{}\"
                                    GROUP BY Name""".format(PROP_ATTRS, self.nameofowner, self.search_by_type_var.get().upper()))
         elif search_attr == SEARCH_BY[3]:
-            self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1) AS AvgRating, COUNT(*) AS Visits
+                vislower_bound = float(self.vis_low_end_text.get())
+                visupper_bound = float(self.vis_high_end_text.get())
+            self.populate_table("""SELECT {}, ROUND(AVG(IFNULL(Rating,0)), 1) AS AvgRating, COUNT(Rating) AS Visits
                                    FROM Property LEFT OUTER JOIN Visit
                                    ON ID=PropertyID
                                    WHERE Owner = \"{}\"
                                    GROUP BY Name
-                                   HAVING Visits={}""".format(PROP_ATTRS, self.nameofowner, search_val))
+                                   HAVING Visits>={} AND Visits<={}""".format(PROP_ATTRS, self.nameofowner, 
+                                                                              vislower_bound, visupper_bound))
         else:
             try:
                 lower_bound = float(self.avg_rat_low_end_text.get())
                 upper_bound = float(self.avg_rat_high_end_text.get())
-                self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1) AS AvgRating, COUNT(*) AS Visits
+                self.populate_table("""SELECT {}, ROUND(AVG(IFNULL(Rating,0)), 1) AS AvgRating, COUNT(Rating) AS Visits
                                        FROM Property LEFT OUTER JOIN Visit
                                        ON ID=PropertyID
                                        WHERE Owner = \"{}\"
@@ -264,12 +301,12 @@ class OwnerWelcomeWindow(Frame):
         self.db_cursor.execute(query)
         data = self.db_cursor.fetchall()
         for i in range(len(data)):
-            row = (data[i][0], data[i][1], data[i][2], data[i][3], data[i][4], data[i][5], "Yes" if data[i][6] == 1 else "No", "Yes" if data[i][7] == 1 else "No", data[i][8], data[i][9], data[i][10])
+            row = (data[i][0], data[i][1], data[i][2], data[i][3], data[i][4], data[i][5], "Yes" if data[i][6] == 1 else "No", "Yes" if data[i][7] == 1 else "No", data[i][8], data[i][10], data[i][9])
             self.table.insert("", i, values=row)
     
 
     def init_populate_table(self):
-        self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1),  COUNT(*)
+        self.populate_table("""SELECT {}, ROUND(AVG(IFNULL(Rating,0)), 1),  COUNT(*)
                                FROM Property LEFT OUTER JOIN Visit ON ID=PropertyID
                                WHERE Owner=\"{}\"
                                GROUP BY Name""".format(PROP_ATTRS, self.nameofowner))
