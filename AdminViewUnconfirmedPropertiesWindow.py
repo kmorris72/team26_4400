@@ -60,7 +60,30 @@ class AdminViewUnconfirmedPropertiesWindow(Frame):
         self.tree['show'] = 'headings'
 
         self.button_container = Frame(self)
-        self.button_container.pack(pady=(30, 30))
+        self.button_container.pack(pady=(0, 30))
+
+        self.sort_container = Frame(self.button_container)
+        self.sort_container.pack(side=LEFT, padx=(50, 0))
+
+        self.sort_by_label = Label(self.sort_container,
+                                   text="Sort By:",
+                                   font="Times 16")
+        self.sort_by_label.pack(side=TOP, pady=(0, 10))
+
+        self.sort_by_var = StringVar(self)
+        self.sort_by_var.set(SEARCH_BY[0])
+
+        self.sort_drop_down = OptionMenu(self.sort_container,
+                                         self.sort_by_var,
+                                         *SEARCH_BY)
+        self.sort_drop_down.pack(side=TOP, pady=(0, 10))
+
+        self.sort_button = Button(self.sort_container,
+                                  text="Sort Table by Chosen Attribute",
+                                  padx=10,
+                                  command=self.sort_button_click_handler)
+        self.sort_button.pack(side=TOP)
+
 
         self.search_container = Frame(self.button_container)
         self.search_container.pack(side=LEFT, padx=(50, 50))
@@ -86,7 +109,7 @@ class AdminViewUnconfirmedPropertiesWindow(Frame):
                                  font="Times 16",
                                  width=10)
         self.search_text.pack(side=TOP, pady=(0, 10))
-        
+
         self.size_search_container = Frame(self.search_container_inner)
 
         self.size_search_low_end_label = Label(self.size_search_container,
@@ -135,6 +158,17 @@ class AdminViewUnconfirmedPropertiesWindow(Frame):
         else:
             self.size_search_container.pack_forget()
             self.search_text.pack()
+
+
+    def sort_button_click_handler(self):
+        sort_attr = self.sort_by_var.get()
+        if sort_attr == SEARCH_BY[0] or sort_attr == SEARCH_BY[1] or sort_attr == SEARCH_BY[2]:
+            self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1)
+                                   FROM Property LEFT OUTER JOIN Visit
+                                   ON ID=PropertyID
+                                   WHERE ApprovedBy IS NULL
+                                   GROUP BY Name
+                                   ORDER BY {}""".format(PROP_ATTRS, sort_attr))
 
 
     def search_button_click_handler(self):

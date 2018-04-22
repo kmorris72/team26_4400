@@ -156,31 +156,31 @@ class AdminViewConfirmedPropertiesWindow(Frame):
     def sort_button_click_handler(self):
         sort_attr = self.sort_by_var.get()
         if sort_attr == SEARCH_BY[0] or sort_attr == SEARCH_BY[1]:
-            self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1) 
+            self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1)
                                    FROM Property LEFT OUTER JOIN Visit
                                    ON ID=PropertyID
-                                   WHERE IsPublic=1 AND ApprovedBy IS NOT NULL
+                                   WHERE ApprovedBy IS NOT NULL
                                    GROUP BY Name
                                    ORDER BY {}""".format(PROP_ATTRS, sort_attr))
         elif sort_attr == SEARCH_BY[2]:
             self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1)
                                    FROM Property LEFT OUTER JOIN Visit
                                    ON ID=PropertyID
-                                   WHERE IsPublic=1 AND ApprovedBy IS NOT NULL
+                                   WHERE ApprovedBy IS NOT NULL
                                    GROUP BY Name
                                    ORDER BY FIELD(PropertyType, \"FARM\", \"GARDEN\", \"ORCHARD\")""".format(PROP_ATTRS))
         elif sort_attr == SEARCH_BY[3]:
             self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1)
                                    FROM Property LEFT OUTER JOIN Visit
                                    ON ID=PropertyID
-                                   WHERE IsPublic=1 AND ApprovedBy IS NOT NULL
+                                   WHERE ApprovedBy IS NOT NULL
                                    GROUP BY Name
                                    ORDER BY ApprovedBy""".format(PROP_ATTRS))
         else:
             self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1) AS AvgRating
                                    FROM Property LEFT OUTER JOIN Visit
-                                   ON ID=PropertyID 
-                                   WHERE IsPublic=1 AND ApprovedBy IS NOT NULL
+                                   ON ID=PropertyID
+                                   WHERE ApprovedBy IS NOT NULL
                                    GROUP BY Name
                                    ORDER BY AvgRating""".format(PROP_ATTRS))
 
@@ -189,28 +189,28 @@ class AdminViewConfirmedPropertiesWindow(Frame):
         search_attr = self.search_by_var.get()
         search_val = self.search_text.get().strip()
         if search_attr == SEARCH_BY[0]:
-            self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1) 
+            self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1)
                                    FROM Property LEFT OUTER JOIN Visit
                                    ON ID=PropertyID
-                                   WHERE IsPublic=1 AND ApprovedBy IS NOT NULL AND {}=\"{}\"
+                                   WHERE ApprovedBy IS NOT NULL AND {}=\"{}\"
                                    GROUP BY Name""".format(PROP_ATTRS, search_attr, search_val))
         elif search_attr == SEARCH_BY[1]:
             self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1)
                                    FROM Property LEFT OUTER JOIN Visit
                                    ON ID=PropertyID
-                                   WHERE IsPublic=1 AND ApprovedBy IS NOT NULL AND {}={}
+                                   WHERE ApprovedBy IS NOT NULL AND {}={}
                                    GROUP BY Name""".format(PROP_ATTRS, search_attr, search_val))
         elif search_attr == SEARCH_BY[2]:
             self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1)
                                    FROM Property LEFT OUTER JOIN Visit
                                    ON ID=PropertyID
-                                   WHERE IsPublic=1 AND ApprovedBy IS NOT NULL AND PropertyType=\"{}\"
+                                   WHERE ApprovedBy IS NOT NULL AND PropertyType=\"{}\"
                                    GROUP BY Name""".format(PROP_ATTRS, self.search_by_type_var.get()))
         elif search_attr == SEARCH_BY[3]:
             self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1) AS AvgRating
                                    FROM Property LEFT OUTER JOIN Visit
                                    ON ID=PropertyID
-                                   WHERE IsPublic=1 AND ApprovedBy IS NOT NULL AND ApprovedBy=\"{}\"
+                                   WHERE ApprovedBy IS NOT NULL AND ApprovedBy=\"{}\"
                                    GROUP BY Name""".format(PROP_ATTRS, search_val))
         else:
             try:
@@ -218,14 +218,14 @@ class AdminViewConfirmedPropertiesWindow(Frame):
                 upper_bound = float(self.avg_rat_high_end_text.get())
                 self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1) AS AvgRating
                                        FROM Property LEFT OUTER JOIN Visit
-                                       ON ID=PropertyID 
-                                       WHERE IsPublic=1 AND ApprovedBy IS NOT NULL
+                                       ON ID=PropertyID
+                                       WHERE ApprovedBy IS NOT NULL
                                        GROUP BY Name
                                        HAVING AvgRating>={} AND AvgRating<={}""".format(PROP_ATTRS, lower_bound, upper_bound))
             except:
                 messagebox.showinfo("Alert", "Please Enter Numbers for the Bounds for the Average Rating.")
 
-    
+
     def manage_prop_button_clicked_handler(self):
         try:
             table_item = self.table.focus()
@@ -241,10 +241,10 @@ class AdminViewConfirmedPropertiesWindow(Frame):
         except:
             messagebox.showinfo("Alert", "Please Select a Property to Manage From the Table.")
 
-    
+
     def back_button_clicked_handler(self):
         self.master.master.show_window("AdminHomeWindow")
-        
+
 
     def populate_table(self, query):
         self.table.delete(*self.table.get_children())
@@ -253,11 +253,11 @@ class AdminViewConfirmedPropertiesWindow(Frame):
         for i in range(len(data)):
             row = (data[i][0], data[i][1], data[i][2], data[i][3], data[i][4], data[i][5], "Yes" if data[i][6] == 1 else "No", "Yes" if data[i][7] == 1 else "No", data[i][8], data[i][9], data[i][10])
             self.table.insert("", i, values=row)
-    
+
 
     def init_populate_table(self):
         self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1)
                                FROM Property LEFT OUTER JOIN Visit
                                ON ID=PropertyID
-                               WHERE IsPublic=1 AND ApprovedBy IS NOT NULL
+                               WHERE ApprovedBy IS NOT NULL
                                GROUP BY Name""".format(PROP_ATTRS))

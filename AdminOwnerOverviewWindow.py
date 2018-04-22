@@ -6,6 +6,11 @@ import tkinter.messagebox as messagebox
 # Column names for the data table. Also serve as possible "search by" terms.
 COLUMN_NAMES = ["Username", "Email", "Number of Properties"]
 
+# The names of the columns that can be used as search terms.
+SEARCH_BY = ["Username","Email","Number of Properties"]
+
+
+OWNER_ATTR="Username, Email"
 
 class AdminOwnerOverviewWindow(Frame):
     def __init__(self, master, db_cursor):
@@ -31,6 +36,44 @@ class AdminOwnerOverviewWindow(Frame):
 
         self.button_container = Frame(self)
         self.button_container.pack(padx=(50, 50), pady=(0, 30))
+
+        self.delete_back_button_container = Frame(self.button_container)
+        self.delete_back_button_container.pack(side=LEFT, padx=(0, 30))
+
+        self.delete_owner_button = Button(self.delete_back_button_container,
+                                         text="Delete Owner Account",
+                                         padx=10,
+                                         command=self.delete_owner_button_clicked_handler)
+        self.delete_owner_button.pack(pady=(0, 20))
+
+        self.back_button = Button(self.delete_back_button_container,
+                                  text="Back",
+                                  padx=10,
+                                  command=self.back_button_clicked_handler)
+        self.back_button.pack()
+
+        self.sort_container = Frame(self.button_container)
+        self.sort_container.pack(side=LEFT, padx=(50, 0))
+
+        self.sort_by_label = Label(self.sort_container,
+                                   text="Sort By:",
+                                   font="Times 16")
+        self.sort_by_label.pack(side=TOP, pady=(0, 10))
+
+        self.sort_by_var = StringVar(self)
+        self.sort_by_var.set(SEARCH_BY[0])
+
+        self.sort_drop_down = OptionMenu(self.sort_container,
+                                         self.sort_by_var,
+                                         *SEARCH_BY)
+        self.sort_drop_down.pack(side=TOP, pady=(0, 10))
+
+        self.sort_button = Button(self.sort_container,
+                                  text="Sort Table by Chosen Attribute",
+                                  padx=10,
+                                  command=self.sort_button_click_handler)
+        self.sort_button.pack(side=TOP)
+
 
         self.search_container = Frame(self.button_container)
         self.search_container.pack(side=LEFT)
@@ -80,20 +123,23 @@ class AdminOwnerOverviewWindow(Frame):
                                     command=self.search_button_clicked_handler)
         self.search_button.pack(side=TOP, pady=(10, 0))
 
-        self.delete_back_button_container = Frame(self.button_container)
-        self.delete_back_button_container.pack(side=LEFT, padx=(0, 30))
+    def sort_button_click_handler(self):
+        sort_attr = self.sort_by_var.get()
+        if sort_attr == SEARCH_BY[0] or sort_attr == SEARCH_BY[1]:
+            self.populate_table("""SELECT {}, Count(*)
+                                   FROM User AS U LEFT OUTER JOIN Property AS P
+                                   ON U.Username=P.Owner
+                                   WHERE U.UserType="OWNER"
+                                   GROUP BY U.Username
+                                   ORDER BY {}""".format(OWNER_ATTR, sort_attr))
+        elif sort_attr == SEARCH_BY[2]:
+             self.populate_table("""SELECT Username, Email, COUNT(ID) as PropCount
+                                    FROM User AS U LEFT OUTER JOIN Property AS P
+                                    ON U.Username=P.Owner
+                                    WHERE U.UserType="OWNER"
+                                    GROUP BY U.Username
+                                    ORDER BY PropCount""".format(OWNER_ATTR))
 
-        self.delete_owner_button = Button(self.delete_back_button_container,
-                                         text="Delete Owner Account",
-                                         padx=10,
-                                         command=self.delete_owner_button_clicked_handler)
-        self.delete_owner_button.pack(pady=(0, 20))
-
-        self.back_button = Button(self.delete_back_button_container,
-                                  text="Back",
-                                  padx=10,
-                                  command=self.back_button_clicked_handler)
-        self.back_button.pack()
 
 
     def delete_owner_button_clicked_handler(self):
@@ -145,7 +191,7 @@ class AdminOwnerOverviewWindow(Frame):
             except:
                 messagebox.showinfo("Alert", "Please Enter Numbers for the Bounds for Number of Properties.")
 
-    
+
     def populate_table(self, query):
         self.table.delete(*self.table.get_children())
         self.db_cursor.execute(query)
