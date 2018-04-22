@@ -39,9 +39,13 @@ class App(Tk):
 
     
     def show_window(self, window):
+      try:
         self.windows[self.curr_window].pack_forget()
         self.windows[window].pack()
-        self.curr_window = window
+      except:
+        self.windows[self.curr_window].grid_forget()
+        self.windows[window].grid()
+      self.curr_window = window
 
 app = App()
 app.mainloop()
