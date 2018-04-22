@@ -328,11 +328,34 @@ class OwnerRegistrationWindow(Frame):
             self.animal_drop_down.pack_forget()
             self.item_type_label.pack_forget()
             self.item_type_drop_down.pack_forget()
+            crop_menu = self.crop_drop_down["menu"]
+            crop_menu.delete(0, END)
+            get_crop_query = ""
+            if self.prop_type_var.get() == PROP_TYPES[1]:
+                get_crop_query = """SELECT Name FROM FarmItem
+                                    WHERE Type=\"Fruit\" OR Type=\"Nut\""""
+            else:
+                get_crop_query = """SELECT Name FROM FarmItem
+                                    WHERE Type=\"Vegetable\" OR Type=\"Flower\""""
+            self.db_cursor.execute(get_crop_query)
+            crop_list = list(self.db_cursor.fetchall())
+            for crop in crop_list:
+                crop_menu.add_command(label=crop[0], command=lambda value=crop[0]: self.crop_var.set(value))
+            self.crop_var.set(crop_list[0][0])
         else:
             self.animal_label.pack(side=LEFT)
             self.animal_drop_down.pack(side=LEFT)
             self.item_type_label.pack(side=LEFT)
             self.item_type_drop_down.pack(side=LEFT)
+            crop_menu = self.crop_drop_down["menu"]
+            crop_menu.delete(0, END)
+            get_crop_query = """SELECT Name FROM FarmItem
+                                WHERE Type<>\"Animal\""""
+            self.db_cursor.execute(get_crop_query)
+            crop_list = list(self.db_cursor.fetchall())
+            for crop in crop_list:
+                crop_menu.add_command(label=crop[0], command=lambda value=crop[0]: self.crop_var.set(value))
+            self.crop_var.set(crop_list[0][0])
 
 
     def clear_text_boxes_reset_drop_downs(self):
