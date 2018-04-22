@@ -1,9 +1,11 @@
 from tkinter import *
 import tkinter.messagebox as messagebox
 import hashlib
+import re as regex
 
 
 class VisitorRegistrationWindow(Frame):
+
     def __init__(self, master, db_cursor):
         Frame.__init__(self, master)
 
@@ -74,6 +76,7 @@ class VisitorRegistrationWindow(Frame):
 
 
     def reg_button_clicked_handler(self):
+        alphanumcheck = regex.compile("^([a-zA-Z0-9-_.])+\@([a-zA-Z0-9])+\.([a-zA-Z0-9])+$")
         # Check for empty text boxes.
         no_empty_text = True
         for text_box in (self.email_text, self.username_text, self.password_text, self.confirm_password_text):
@@ -87,9 +90,19 @@ class VisitorRegistrationWindow(Frame):
             messagebox.showinfo("Alert", "Please confirm that passwords match.")
         else:
             passwords_match = True
+        
+        email = self.email_text.get().strip()
+        validemail = True;
+        if (regex.match(alphanumcheck, email) == None) {
+            messagebox.showinfo("Alert", "Please confirm that consists of alphanumeric characters, followed by an @"
+            + "symbol, followed by alphanumeric characters, followed by a . symbol, followed "
+            + "by alphanumeric characters.")
+            validemail = False;
+        }
+
 
         # Check that the email is not already in the database.
-        email = self.email_text.get().strip()
+        
         duplicate_email = False
         email_query = "SELECT * FROM User WHERE Email=\"{}\"".format(email)
         self.db_cursor.execute(email_query)
@@ -107,7 +120,7 @@ class VisitorRegistrationWindow(Frame):
             duplicate_username = True
         
         # If none of the above conditions were violated, add the user and send them back to the login window.
-        if no_empty_text and passwords_match and not duplicate_email and not duplicate_username:
+        if no_empty_text and passwords_match and not duplicate_email and not duplicate_username and validemail:
             password = hashlib.md5(self.password_text.get().encode("utf-8")).digest()
             insert_query = "INSERT INTO User VALUES (\"{}\", \"{}\", \"{}\", \"VISITOR\")".format(username, email, password)
             self.db_cursor.execute(insert_query)
