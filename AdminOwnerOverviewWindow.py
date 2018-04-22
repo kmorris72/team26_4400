@@ -32,21 +32,6 @@ class AdminOwnerOverviewWindow(Frame):
         self.button_container = Frame(self)
         self.button_container.pack(padx=(50, 50), pady=(0, 30))
 
-        self.delete_back_button_container = Frame(self.button_container)
-        self.delete_back_button_container.pack(side=LEFT, padx=(0, 30))
-
-        self.delete_owner_button = Button(self.delete_back_button_container,
-                                         text="Delete Owner Account",
-                                         padx=10,
-                                         command=self.delete_owner_button_clicked_handler)
-        self.delete_owner_button.pack(pady=(0, 20))
-
-        self.back_button = Button(self.delete_back_button_container,
-                                  text="Back",
-                                  padx=10,
-                                  command=self.back_button_clicked_handler)
-        self.back_button.pack()
-
         self.search_container = Frame(self.button_container)
         self.search_container.pack(side=LEFT)
 
@@ -94,6 +79,21 @@ class AdminOwnerOverviewWindow(Frame):
                                     padx=10,
                                     command=self.search_button_clicked_handler)
         self.search_button.pack(side=TOP, pady=(10, 0))
+
+        self.delete_back_button_container = Frame(self.button_container)
+        self.delete_back_button_container.pack(side=LEFT, padx=(0, 30))
+
+        self.delete_owner_button = Button(self.delete_back_button_container,
+                                         text="Delete Owner Account",
+                                         padx=10,
+                                         command=self.delete_owner_button_clicked_handler)
+        self.delete_owner_button.pack(pady=(0, 20))
+
+        self.back_button = Button(self.delete_back_button_container,
+                                  text="Back",
+                                  padx=10,
+                                  command=self.back_button_clicked_handler)
+        self.back_button.pack()
 
 
     def delete_owner_button_clicked_handler(self):

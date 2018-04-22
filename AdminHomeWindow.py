@@ -101,7 +101,7 @@ class AdminHomeWindow(Frame):
 
 
     def pending_items_button_clicked_handler(self):
-        self.master.master.windows["AdminViewPendingItemsWindow"].populate_table()
+        self.master.master.windows["AdminViewPendingItemsWindow"].init_populate_table()
         self.master.master.show_window("AdminViewPendingItemsWindow")
 
 

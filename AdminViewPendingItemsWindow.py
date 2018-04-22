@@ -3,6 +3,11 @@ from tkinter import ttk
 import tkinter.messagebox as messagebox
 
 
+# Attributes used for sorting.
+
+SORT_BY = ["Name", "Type"]
+
+
 class AdminViewPendingItemsWindow(Frame):
     def __init__(self, master, db_cursor):
         Frame.__init__(self, master)
@@ -28,6 +33,28 @@ class AdminViewPendingItemsWindow(Frame):
 
         self.button_container = Frame(self)
         self.button_container.pack(pady=40 , padx = 20)
+
+        self.sort_container = Frame(self.button_container)
+        self.sort_container.pack(side=LEFT, padx=(20, 0))
+
+        self.sort_by_label = Label(self.sort_container,
+                                   text="Sort By:",
+                                   font="Times 16")
+        self.sort_by_label.pack(side=TOP, pady=(0, 10))
+
+        self.sort_by_var = StringVar(self)
+        self.sort_by_var.set(SORT_BY[0])
+
+        self.sort_drop_down = OptionMenu(self.sort_container,
+                                         self.sort_by_var,
+                                         *SORT_BY)
+        self.sort_drop_down.pack(side=TOP, pady=(0, 10))
+
+        self.sort_button = Button(self.sort_container,
+                                  text="Sort Table by Chosen Attribute",
+                                  padx=10,
+                                  command=self.sort_button_clicked_handler)
+        self.sort_button.pack(side=TOP)
 
         self.approve_selection_button = Button(self.button_container,
                                    text="Approve \nSelection",
@@ -64,6 +91,20 @@ class AdminViewPendingItemsWindow(Frame):
         else:
             messagebox.showinfo("Alert", "Item Not Approved.")
 
+    
+    def sort_button_clicked_handler(self):
+        sort_attr = self.sort_by_var.get()
+        if sort_attr == SORT_BY[0]:
+            self.populate_table("""SELECT Name, Type
+                                   FROM FarmItem
+                                   WHERE IsApproved=0
+                                   ORDER BY Name""")
+        else:
+            self.populate_table("""SELECT Name, Type
+                                   FROM FarmItem
+                                   WHERE IsApproved=0
+                                   ORDER BY FIELD(Type, \"ANIMAL\", \"FLOWER\", \"FRUIT\", \"NUT\", \"VEGETABLE\")""")
+
 
     def delete_button_clicked_handler(self):
         should_delete = messagebox.askyesno("Alert", "Are You Sure You Want to Delete the Selected Item?")
@@ -83,13 +124,16 @@ class AdminViewPendingItemsWindow(Frame):
         self.master.master.show_window("AdminHomeWindow")
 
     
-    def populate_table(self):
+    def populate_table(self, query):
         self.tree.delete(*self.tree.get_children())
-        query = """SELECT Name, Type
-                   FROM FarmItem
-                   WHERE IsApproved=0"""
         self.db_cursor.execute(query)
         data = self.db_cursor.fetchall()
         for i in range(len(data)):
             row = (data[i][0], data[i][1])
             self.tree.insert("", i, values=row)
+
+    
+    def init_populate_table(self):
+        self.populate_table("""SELECT Name, Type
+                               FROM FarmItem
+                               WHERE IsApproved=0""")

@@ -96,6 +96,28 @@ class AdminViewApprovedItemsWindow(Frame):
                                     command=self.search_button_clicked_handler)
         self.search_button.pack(pady=(20, 0))
 
+        self.sort_container = Frame(self.two_container)
+        self.sort_container.pack(pady=(20, 30))
+
+        self.sort_by_label = Label(self.sort_container,
+                                   text="Sort By:",
+                                   font="Times 16")
+        self.sort_by_label.pack(side=TOP, pady=(0, 10))
+
+        self.sort_by_var = StringVar(self)
+        self.sort_by_var.set(SEARCH_BY[0])
+
+        self.sort_drop_down = OptionMenu(self.sort_container,
+                                         self.sort_by_var,
+                                         *SEARCH_BY)
+        self.sort_drop_down.pack(side=TOP, pady=(0, 10))
+
+        self.sort_button = Button(self.sort_container,
+                                  text="Sort Table by Chosen Attribute",
+                                  padx=10,
+                                  command=self.sort_button_clicked_handler)
+        self.sort_button.pack(side=TOP)
+
         self.button_container = Frame(self)
         self.button_container.pack(pady=(30, 0))
 
@@ -133,6 +155,20 @@ class AdminViewApprovedItemsWindow(Frame):
         else:
             self.search_term.pack_forget()
             self.search_item_type_drop_down.pack()
+
+
+    def sort_button_clicked_handler(self):
+        sort_attr = self.sort_by_var.get()
+        if sort_attr == SEARCH_BY[0]:
+            self.populate_table("""SELECT Name, Type
+                                   FROM FarmItem
+                                   WHERE IsApproved=1
+                                   ORDER BY Name""")
+        else:
+            self.populate_table("""SELECT Name, Type
+                                   FROM FarmItem
+                                   WHERE IsApproved=1
+                                   ORDER BY FIELD(Type, \"ANIMAL\", \"FLOWER\", \"FRUIT\", \"NUT\", \"VEGETABLE\")""")
 
 
     def search_button_clicked_handler(self):

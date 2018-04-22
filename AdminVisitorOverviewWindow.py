@@ -54,27 +54,6 @@ class AdminVisitorOverviewWindow(Frame):
                                   command=self.sort_button_clicked_handler)
         self.sort_button.pack(side=TOP)
 
-        self.delete_back_button_container = Frame(self.button_container)
-        self.delete_back_button_container.pack(side=LEFT, padx=(0, 30))
-
-        self.delete_visitor_button = Button(self.delete_back_button_container,
-                                         text="Delete Visitor Account",
-                                         padx=10,
-                                         command=self.delete_visitor_button_clicked_handler)
-        self.delete_visitor_button.pack(pady=(0, 20))
-
-        self.delete_log_button = Button(self.delete_back_button_container,
-                                         text="Delete Log History",
-                                         padx=10,
-                                         command=self.delete_log_button_clicked_handler)
-        self.delete_log_button.pack(pady=(0, 20))
-
-        self.back_button = Button(self.delete_back_button_container,
-                                  text="Back",
-                                  padx=10,
-                                  command=self.back_button_clicked_handler)
-        self.back_button.pack()
-
         self.search_container = Frame(self.button_container)
         self.search_container.pack(side=LEFT)
 
@@ -127,6 +106,27 @@ class AdminVisitorOverviewWindow(Frame):
                                     padx=10,
                                     command=self.search_button_clicked_handler)
         self.search_button.pack(side=TOP)
+
+        self.delete_back_button_container = Frame(self.button_container)
+        self.delete_back_button_container.pack(side=LEFT, padx=(0, 30))
+
+        self.delete_visitor_button = Button(self.delete_back_button_container,
+                                         text="Delete Visitor Account",
+                                         padx=10,
+                                         command=self.delete_visitor_button_clicked_handler)
+        self.delete_visitor_button.pack(pady=(0, 20))
+
+        self.delete_log_button = Button(self.delete_back_button_container,
+                                         text="Delete Log History",
+                                         padx=10,
+                                         command=self.delete_log_button_clicked_handler)
+        self.delete_log_button.pack(pady=(0, 20))
+
+        self.back_button = Button(self.delete_back_button_container,
+                                  text="Back",
+                                  padx=10,
+                                  command=self.back_button_clicked_handler)
+        self.back_button.pack()
 
 
     def delete_visitor_button_clicked_handler(self):
