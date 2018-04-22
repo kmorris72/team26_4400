@@ -328,15 +328,16 @@ class OwnerRegistrationWindow(Frame):
             self.animal_drop_down.pack_forget()
             self.item_type_label.pack_forget()
             self.item_type_drop_down.pack_forget()
+            
             crop_menu = self.crop_drop_down["menu"]
             crop_menu.delete(0, END)
             get_crop_query = ""
             if self.prop_type_var.get() == PROP_TYPES[1]:
                 get_crop_query = """SELECT Name FROM FarmItem
-                                    WHERE Type=\"Fruit\" OR Type=\"Nut\""""
+                                    WHERE (Type=\"FRUIT\" OR Type=\"NUT\") AND IsApproved=1"""
             else:
                 get_crop_query = """SELECT Name FROM FarmItem
-                                    WHERE Type=\"Vegetable\" OR Type=\"Flower\""""
+                                    WHERE (Type=\"VEGETABLE\" OR Type=\"FLOWER\") AND IsApproved=1"""
             self.db_cursor.execute(get_crop_query)
             crop_list = list(self.db_cursor.fetchall())
             for crop in crop_list:
@@ -347,10 +348,11 @@ class OwnerRegistrationWindow(Frame):
             self.animal_drop_down.pack(side=LEFT)
             self.item_type_label.pack(side=LEFT)
             self.item_type_drop_down.pack(side=LEFT)
+
             crop_menu = self.crop_drop_down["menu"]
             crop_menu.delete(0, END)
             get_crop_query = """SELECT Name FROM FarmItem
-                                WHERE Type<>\"Animal\""""
+                                WHERE Type<>\"Animal\" AND IsApproved=1"""
             self.db_cursor.execute(get_crop_query)
             crop_list = list(self.db_cursor.fetchall())
             for crop in crop_list:

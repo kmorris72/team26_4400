@@ -12,6 +12,9 @@ APPROVED_CROPS = []
 # Values for IsPublic/IsCommercial.
 PUB_COMM_OPTIONS = ["True", "False"]
 
+# Property types.
+PROP_TYPES = ["FARM", "GARDEN", "ORCHARD"]
+
 
 class AdminManagePropertyWindow(Frame):
     def __init__(self, master, db_cursor):
@@ -120,10 +123,10 @@ class AdminManagePropertyWindow(Frame):
         self.basic_info_container_labels_part_2_right_side=Frame(self.basic_info_container_labels_part_2)
         self.basic_info_container_labels_part_2_right_side.pack(side=RIGHT)
 
-        self.a_type_label = Label(self.basic_info_container_labels_part_2_right_side,
+        self.prop_type_label = Label(self.basic_info_container_labels_part_2_right_side,
                            text="Farm",
                            font="Times 12")
-        self.a_type_label.pack()
+        self.prop_type_label.pack()
 
         self.public_var = StringVar(self.basic_info_container_labels_part_2_right_side)
         self.public_var.set(PUB_COMM_OPTIONS[1])
@@ -226,7 +229,8 @@ class AdminManagePropertyWindow(Frame):
         self.delete_property_button = Button(self.delete_save_back_buttons_container,
                                    text="Delete Property",
                                    padx=10,
-                                   width = 12)
+                                   width = 12,
+                                   command=self.delete_property_button_clicked_handler)
         self.delete_property_button.pack(side=LEFT, pady=(75,0))
 
         self.delete_save_back_buttons_container_middle_section = Frame(self.delete_save_back_buttons_container)
@@ -282,8 +286,8 @@ class AdminManagePropertyWindow(Frame):
         if messagebox.askyesno("Alert", "Are You Sure You Want to Save the Changes to this Property?"):
             try:
                 make_prop_changes_query = """UPDATE Property
-                                             SET Name="{}", Street="{}", City="{}". Zip={}, Size={}, IsPublic={}, IsApproved={}
-                                             WHERE ID={}""".format(self.name_entry.get(), self.address_entry.get(), self.city_entry.get(), int(self.zip_entry.get()), float(self.size_entry.get()), 1 if self.public_var.get() == "True" else 0, 1 if self.comm_var.get() == "True" else 0, self.property[0])
+                                                SET Name="{}", Street="{}", City="{}", Zip={}, Size={}, IsPublic={}, IsCommercial={}
+                                                WHERE ID={}""".format(self.name_entry.get(), self.address_entry.get(), self.city_entry.get(), int(self.zip_entry.get()), float(self.size_entry.get()), 1 if self.public_var.get() == "True" else 0, 1 if self.comm_var.get() == "True" else 0, self.property[0])
                 self.db_cursor.execute(make_prop_changes_query)
                 messagebox.showinfo("Alert", "Changes saved.")
             except:
@@ -293,6 +297,7 @@ class AdminManagePropertyWindow(Frame):
 
     
     def back_button_clicked_handler(self):
+        self.master.master.windows[self.previous_window].init_populate_table()
         self.master.master.show_window(self.previous_window)
 
     
@@ -314,6 +319,8 @@ class AdminManagePropertyWindow(Frame):
 
         self.zip_entry.delete(0, END)
         self.zip_entry.insert(0, prop[7])
+
+        self.prop_type_label.config(text=prop[8])
 
         self.size_entry.delete(0, END)
         self.size_entry.insert(0, prop[2])
@@ -340,11 +347,28 @@ class AdminManagePropertyWindow(Frame):
         self.db_cursor.execute(animal_query)
         animals_result = self.db_cursor.fetchall()
 
-        crop_query = """SELECT Name
-                        FROM FarmItem
-                        WHERE Type<>"ANIMAL" AND IsApproved=1"""
+        crop_query = ""
+        if self.property[8] == PROP_TYPES[0]:
+            self.add_animals_or_crops_container_add_animal.pack()
+            crop_query = """SELECT Name
+                            FROM FarmItem
+                            WHERE Type<>\"ANIMAL\" AND IsApproved=1"""
+        elif self.property[8] == PROP_TYPES[1]:
+            self.add_animals_or_crops_container_add_animal.pack_forget()
+            crop_query = """SELECT Name
+                            FROM FarmItem
+                            WHERE (Type=\"VEGETABLE\" OR Type=\"FLOWER\") AND IsApproved=1"""
+        else:
+            self.add_animals_or_crops_container_add_animal.pack_forget()
+            crop_query = """SELECT Name
+                            FROM FarmItem
+                            WHERE (Type=\"FRUIT\" OR Type=\"NUT\") AND IsApproved=1"""
+
         self.db_cursor.execute(crop_query)
         crops_result = self.db_cursor.fetchall()
+
+        APPROVED_ANIMALS = []
+        APPROVED_CROPS = []
 
         for i in range(len(animals_result)):
             APPROVED_ANIMALS.append(animals_result[i][0])
@@ -353,13 +377,13 @@ class AdminManagePropertyWindow(Frame):
             APPROVED_CROPS.append(crops_result[i][0])
         
         animal_menu = self.animal_drop_down["menu"]
-        animal_menu.delete(0, END)
+        animal_menu.delete(0, "end")
         for animal in APPROVED_ANIMALS:
             animal_menu.add_command(label=animal, command=lambda value=animal: self.animal_var.set(value))
         self.animal_var.set(APPROVED_ANIMALS[0])
 
         crop_menu = self.crop_drop_down["menu"]
-        crop_menu.delete(0, END)
+        crop_menu.delete(0, "end")
         for crop in APPROVED_CROPS:
             crop_menu.add_command(label=crop, command=lambda value=crop: self.crop_var.set(value))
         self.crop_var.set(APPROVED_CROPS[0])

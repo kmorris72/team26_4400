@@ -227,16 +227,19 @@ class AdminViewConfirmedPropertiesWindow(Frame):
 
     
     def manage_prop_button_clicked_handler(self):
-        table_item = self.table.focus()
-        property_id = self.table.item(table_item)["values"][8]
-        get_prop_query = """SELECT * FROM Property
-                            WHERE ID={}""".format(property_id)
-        self.db_cursor.execute(get_prop_query)
-        prop = self.db_cursor.fetchall()[0]
-        self.master.master.windows["AdminManagePropertyWindow"].fill_in_data_from_prop(prop)
-        self.master.master.windows["AdminManagePropertyWindow"].get_approved_animals_and_crops_from_db()
-        self.master.master.windows["AdminManagePropertyWindow"].set_previous_window("AdminViewConfirmedPropertiesWindow")
-        self.master.master.show_window("AdminManagePropertyWindow")
+        try:
+            table_item = self.table.focus()
+            property_id = self.table.item(table_item)["values"][8]
+            get_prop_query = """SELECT * FROM Property
+                                WHERE ID={}""".format(property_id)
+            self.db_cursor.execute(get_prop_query)
+            prop = self.db_cursor.fetchall()[0]
+            self.master.master.windows["AdminManagePropertyWindow"].fill_in_data_from_prop(prop)
+            self.master.master.windows["AdminManagePropertyWindow"].get_approved_animals_and_crops_from_db()
+            self.master.master.windows["AdminManagePropertyWindow"].set_previous_window("AdminViewConfirmedPropertiesWindow")
+            self.master.master.show_window("AdminManagePropertyWindow")
+        except:
+            messagebox.showinfo("Alert", "Please Select a Property to Manage From the Table.")
 
     
     def back_button_clicked_handler(self):
