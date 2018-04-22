@@ -330,6 +330,19 @@ class OwnerManagePropertyWindow(Frame):
     def save_button_clicked_handler(self):
         if messagebox.askyesno("Alert", "Are You Sure You Want to Save the Changes to this Property?"):
             try:
+              no_empty_text = True
+              for text_box in (self.name_entry.get(), self.address_entry.get(), self.city_entry.get(), self.zip_entry.get()):
+              if (text_box.get().strip() == ""):
+                messagebox.showinfo("Alert", "Please fill out all fields.")
+                no_empty_text = False
+
+
+              if (no_empty_text) :
+                make_prop_changes_query = """UPDATE Property
+                                                SET Name="{}", Street="{}", City="{}", Zip={}, Size={}, IsPublic={}, IsCommercial={}
+                                                WHERE ID={}""".format(self.name_entry.get(), self.address_entry.get(), self.city_entry.get(), int(self.zip_entry.get()), float(self.size_entry.get()), 1 if self.public_var.get() == "True" else 0, 1 if self.comm_var.get() == "True" else 0, self.property[0])
+                self.db_cursor.execute(make_prop_changes_query)
+                messagebox.showinfo("Alert", "Changes saved.")
                 make_prop_changes_query = """UPDATE Property
                                                 SET Name="{}", Street="{}", City="{}", Zip={}, Size={}, IsPublic={}, IsCommercial={}
                                                 WHERE ID={}""".format(self.name_entry.get(), self.address_entry.get(), self.city_entry.get(), int(self.zip_entry.get()), float(self.size_entry.get()), 1 if self.public_var.get() == "True" else 0, 1 if self.comm_var.get() == "True" else 0, self.property[0])
