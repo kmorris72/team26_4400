@@ -317,7 +317,7 @@ class OwnerWelcomeWindow(Frame):
     
 
     def init_populate_table(self):
-        self.populate_table("""SELECT {}, ROUND(AVG(IFNULL(Rating,0)), 1),  COUNT(*)
+        self.populate_table("""SELECT {}, ROUND(AVG(IFNULL(Rating,0)), 1), COUNT(Rating) AS Visits
                                FROM Property LEFT OUTER JOIN Visit ON ID=PropertyID
                                WHERE Owner=\"{}\"
                                GROUP BY Name""".format(PROP_ATTRS, self.nameofowner))
