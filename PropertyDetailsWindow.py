@@ -17,13 +17,15 @@ class PropertyDetailsWindow(Frame):
         Frame.__init__(self, parent)
         self.db_cursor = db_cursor
         #self.master = master
-        #master.title(current_property + " Property Details")
+        #master.title(self.current_property + " Property Details")
 
-        current_property = "Jacob's Farm"
-        
-        prop_detail_query = "SELECT * FROM Property WHERE Name=\"{}\"".format(current_property)
+        self.current_property = ""
+
+    def populate():
+        prop_detail_query = "SELECT * FROM Property WHERE Name=\"{}\"".format(self.current_property)
         self.db_cursor.execute(prop_detail_query)
         prop_details = self.db_cursor.fetchall()
+        print(prop_details)
         #print(prop_details[0])
         prop_id = prop_details[0][0]
         prop_size = prop_details[0][2]
@@ -75,10 +77,10 @@ class PropertyDetailsWindow(Frame):
         prop_animal_list = prop_animal_list[0:len(prop_animal_list)-2]
 
 
-        Label(self, text=current_property + " Property Details", font="Times 24"). grid(row=0, columnspan=6)
+        Label(self, text=self.current_property + " Property Details", font="Times 24"). grid(row=0, columnspan=6)
 
         Label(self, text="Name:", font="Times 12").grid(row=1,column=0, sticky=E, padx=0)
-        Label(self, text=current_property, font="Times 12").grid(row=1,column=1, sticky=W, padx=0)
+        Label(self, text=self.current_property, font="Times 12").grid(row=1,column=1, sticky=W, padx=0)
 
         Label(self, text="Owner:", font="Times 12").grid(row=2,column=0, sticky=E, padx=0)
         Label(self, text=prop_owner, font="Times 12").grid(row=2,column=1, sticky=W, padx=0)
