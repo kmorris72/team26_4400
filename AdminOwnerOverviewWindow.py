@@ -1,0 +1,209 @@
+from tkinter import *
+from tkinter import ttk
+import tkinter.messagebox as messagebox
+
+
+# Column names for the data table. Also serve as possible "search by" terms.
+COLUMN_NAMES = ["Username", "Email", "Number of Properties"]
+
+# The names of the columns that can be used as search terms.
+SEARCH_BY = ["Username","Email","Number of Properties"]
+
+
+OWNER_ATTR="Username, Email"
+
+class AdminOwnerOverviewWindow(Frame):
+    def __init__(self, master, db_cursor):
+        Frame.__init__(self, master)
+
+        self.db_cursor = db_cursor
+
+        self.welcome_label = Label(self,
+                           text="All Owners in System",
+                           font="Times 36")
+        self.welcome_label.pack(pady=(0, 5))
+
+        self.table = ttk.Treeview(self, columns=tuple(COLUMN_NAMES))
+        self.table.pack(pady=(0, 50))
+        self.table.displaycolumns = COLUMN_NAMES
+
+        # This line makes the annoying empty first column go away.
+        self.table["show"] = "headings"
+
+        for col in COLUMN_NAMES:
+            self.table.column(col, width=120)
+            self.table.heading(col, text=col)
+
+        self.button_container = Frame(self)
+        self.button_container.pack(padx=(50, 50), pady=(0, 30))
+
+        self.delete_back_button_container = Frame(self.button_container)
+        self.delete_back_button_container.pack(side=LEFT, padx=(0, 30))
+
+        self.delete_owner_button = Button(self.delete_back_button_container,
+                                         text="Delete Owner Account",
+                                         padx=10,
+                                         command=self.delete_owner_button_clicked_handler)
+        self.delete_owner_button.pack(pady=(0, 20))
+
+        self.back_button = Button(self.delete_back_button_container,
+                                  text="Back",
+                                  padx=10,
+                                  command=self.back_button_clicked_handler)
+        self.back_button.pack()
+
+        self.sort_container = Frame(self.button_container)
+        self.sort_container.pack(side=LEFT, padx=(50, 0))
+
+        self.sort_by_label = Label(self.sort_container,
+                                   text="Sort By:",
+                                   font="Times 16")
+        self.sort_by_label.pack(side=TOP, pady=(0, 10))
+
+        self.sort_by_var = StringVar(self)
+        self.sort_by_var.set(SEARCH_BY[0])
+
+        self.sort_drop_down = OptionMenu(self.sort_container,
+                                         self.sort_by_var,
+                                         *SEARCH_BY)
+        self.sort_drop_down.pack(side=TOP, pady=(0, 10))
+
+        self.sort_button = Button(self.sort_container,
+                                  text="Sort Table by Chosen Attribute",
+                                  padx=10,
+                                  command=self.sort_button_click_handler)
+        self.sort_button.pack(side=TOP)
+
+
+        self.search_container = Frame(self.button_container)
+        self.search_container.pack(side=LEFT)
+
+        self.search_container_inner = Frame(self.search_container)
+        self.search_container_inner.pack()
+
+        self.search_by_var = StringVar(self)
+        self.search_by_var.set(COLUMN_NAMES[0])
+        self.search_by_var.trace("w", self.search_by_var_changed_handler)
+
+        self.search_by_drop_down = OptionMenu(self.search_container_inner,
+                                              self.search_by_var,
+                                              *COLUMN_NAMES)
+        self.search_by_drop_down.pack(side=TOP, pady=(0, 10))
+
+        self.search_text = Entry(self.search_container_inner,
+                                 font="Times 16",
+                                 width=10)
+        self.search_text.pack(side=TOP, pady=(0, 10))
+
+        self.num_prop_search_container = Frame(self.search_container_inner)
+
+        self.num_prop_low_label = Label(self.num_prop_search_container,
+                                        text="Lower End of Range:",
+                                        font="Times 16")
+        self.num_prop_low_label.pack()
+
+        self.num_prop_range_low_text = Entry(self.num_prop_search_container,
+                                             font="Times 16",
+                                             width=10)
+        self.num_prop_range_low_text.pack(pady=(0, 10))
+
+        self.num_prop_high_label = Label(self.num_prop_search_container,
+                                        text="Higher End of Range:",
+                                        font="Times 16")
+        self.num_prop_high_label.pack()
+
+        self.num_prop_range_high_text = Entry(self.num_prop_search_container,
+                                             font="Times 16",
+                                             width=10)
+        self.num_prop_range_high_text.pack(pady=(0, 10))
+
+        self.search_button = Button(self.search_container,
+                                    text="Search Properties",
+                                    padx=10,
+                                    command=self.search_button_clicked_handler)
+        self.search_button.pack(side=TOP, pady=(10, 0))
+
+    def sort_button_click_handler(self):
+        sort_attr = self.sort_by_var.get()
+        if sort_attr == SEARCH_BY[0] or sort_attr == SEARCH_BY[1]:
+            self.populate_table("""SELECT {}, Count(*)
+                                   FROM User AS U LEFT OUTER JOIN Property AS P
+                                   ON U.Username=P.Owner
+                                   WHERE U.UserType="OWNER"
+                                   GROUP BY U.Username
+                                   ORDER BY {}""".format(OWNER_ATTR, sort_attr))
+        elif sort_attr == SEARCH_BY[2]:
+             self.populate_table("""SELECT Username, Email, COUNT(ID) as PropCount
+                                    FROM User AS U LEFT OUTER JOIN Property AS P
+                                    ON U.Username=P.Owner
+                                    WHERE U.UserType="OWNER"
+                                    GROUP BY U.Username
+                                    ORDER BY PropCount""".format(OWNER_ATTR))
+
+
+
+    def delete_owner_button_clicked_handler(self):
+        should_delete = messagebox.askyesno("Alert", "Do You Really Want to Delete the Selected Owner?")
+        if should_delete:
+            table_item = self.table.focus()
+            owner_username = self.table.item(table_item)["values"][0]
+            delete_query = """DELETE FROM User
+                              WHERE Username=\"{}\"""".format(owner_username)
+            self.db_cursor.execute(delete_query)
+            self.table.delete(table_item)
+            messagebox.showinfo("Alert", "Deleted Selected Owner.")
+        else:
+            messagebox.showinfo("Alert", "Owner Not Deleted.")
+
+
+    def back_button_clicked_handler(self):
+        self.master.master.show_window("AdminHomeWindow")
+
+
+    def search_by_var_changed_handler(self, x, y, z):
+        if self.search_by_var.get() == COLUMN_NAMES[0] or self.search_by_var.get() == COLUMN_NAMES[1]:
+            self.num_prop_search_container.pack_forget()
+            self.search_text.pack()
+        else:
+            self.search_text.pack_forget()
+            self.num_prop_search_container.pack()
+
+
+    def search_button_clicked_handler(self):
+        search_attr = self.search_by_var.get()
+        if search_attr == COLUMN_NAMES[0] or search_attr == COLUMN_NAMES[1]:
+            search_val = self.search_text.get()
+            self.populate_table("""SELECT Username, Email, COUNT(ID)
+                                   FROM User AS U LEFT OUTER JOIN Property AS P
+                                   ON U.Username=P.Owner
+                                   WHERE U.UserType="OWNER" AND U.{}=\"{}\"
+                                   GROUP BY U.Username""".format(search_attr, search_val))
+        else:
+            try:
+                lower_bound = int(self.num_prop_range_low_text.get())
+                upper_bound = int(self.num_prop_range_high_text.get())
+                self.populate_table("""SELECT Username, Email, COUNT(ID) as PropCount
+                                       FROM User AS U LEFT OUTER JOIN Property AS P
+                                       ON U.Username=P.Owner
+                                       WHERE U.UserType="OWNER"
+                                       GROUP BY U.Username
+                                       HAVING PropCount>={} AND PropCount<={}""".format(lower_bound, upper_bound))
+            except:
+                messagebox.showinfo("Alert", "Please Enter Numbers for the Bounds for Number of Properties.")
+
+
+    def populate_table(self, query):
+        self.table.delete(*self.table.get_children())
+        self.db_cursor.execute(query)
+        data = self.db_cursor.fetchall()
+        for i in range(len(data)):
+            row = (data[i][0], data[i][1], data[i][2])
+            self.table.insert("", i, values=row)
+
+
+    def init_populate_table(self):
+        self.populate_table("""SELECT Username, Email, COUNT(ID)
+                               FROM User AS U LEFT OUTER JOIN Property AS P
+                               ON U.Username=P.Owner
+                               WHERE U.UserType="OWNER"
+                               GROUP BY U.Username""")
