@@ -14,10 +14,14 @@ from AdminManagePropertyWindow import AdminManagePropertyWindow
 from VisitHistory import VisitHistory
 from VisitorHomeWindow import VisitorHomeWindow
 from VisitorViewPropertyDetails import VisitorViewPropertyDetails
+from AddNewPropertyWindow import AddNewPropertyWindow
+from OwnerWelcomeWindow import OwnerWelcomeWindow
+from OwnerManagePropertyWindow import OwnerManagePropertyWindow
+from PropertyDetailsWindow import PropertyDetailsWindow
 
 
 # All of the windows that make up the app.
-ALL_WINDOWS = (LoginWindow, OwnerRegistrationWindow, VisitorRegistrationWindow, AdminOwnerOverviewWindow, AdminViewConfirmedPropertiesWindow, AdminVisitorOverviewWindow, AdminViewPendingItemsWindow, AdminHomeWindow, AdminViewApprovedItemsWindow, AdminViewUnconfirmedPropertiesWindow, AdminManagePropertyWindow, VisitHistory, VisitorHomeWindow, VisitorViewPropertyDetails)
+ALL_WINDOWS = (LoginWindow, OwnerRegistrationWindow, VisitorRegistrationWindow, AdminOwnerOverviewWindow, AdminViewConfirmedPropertiesWindow, AdminVisitorOverviewWindow, AdminViewPendingItemsWindow, AdminHomeWindow, AdminViewApprovedItemsWindow, AdminViewUnconfirmedPropertiesWindow, AdminManagePropertyWindow, VisitHistory, VisitorHomeWindow, VisitorViewPropertyDetails, AddNewPropertyWindow, OwnerWelcomeWindow, OwnerManagePropertyWindow, PropertyDetailsWindow)
 
 
 class App(Tk):

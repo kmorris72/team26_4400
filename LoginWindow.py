@@ -83,7 +83,9 @@ class LoginWindow(Frame):
                 self.master.master.windows["AdminHomeWindow"].set_label_text()
                 self.master.master.show_window("AdminHomeWindow")
             elif user_type == USER_TYPES[1]:
-                self.master.master.show_window("OwnerRegistrationWindow")
+                self.master.master.windows["OwnerWelcomeWindow"].nameofowner = data[0][0]
+                self.master.master.windows["OwnerWelcomeWindow"].init_populate_table()
+                self.master.master.show_window("OwnerWelcomeWindow")
             else:
                 self.master.master.windows["VisitorHomeWindow"].set_uname(self.email_text.get()) 
                 self.master.master.windows["VisitorViewPropertyDetails"].set_uname(self.email_text.get()) 
