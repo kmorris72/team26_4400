@@ -132,6 +132,12 @@ class OwnerWelcomeWindow(Frame):
                                          command=self.manage_prop_button_clicked_handler)
         self.manage_prop_button.pack(side=LEFT, padx=(0, 50))
 
+        self.view_other_props_button = Button(self.button_container,
+                                              text="View Other Properties",
+                                              padx=10,
+                                              command=self.view_other_probs_button_clicked_handler)
+        self.view_other_props_button.pack(side=LEFT, padx=(0, 50))
+
         self.add_prop_button = Button(self.button_container,
                                          text="Add Property",
                                          padx=10,
@@ -254,6 +260,11 @@ class OwnerWelcomeWindow(Frame):
 
     def add_prop_button_clicked_handler(self): 
         self.master.master.show_window("AddNewPropertyWindow")
+
+    def view_other_probs_button_clicked_handler(self):
+        self.master.master.windows["OwnerViewOtherOwnersPropertiesWindow"].curr_owner = self.nameofowner
+        self.master.master.windows["OwnerViewOtherOwnersPropertiesWindow"].init_populate_table()
+        self.master.master.show_window("OwnerViewOtherOwnersPropertiesWindow")
     
     def back_button_clicked_handler(self):
         self.master.master.show_window("LoginWindow")

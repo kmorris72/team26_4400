@@ -87,8 +87,8 @@ class LoginWindow(Frame):
                 self.master.master.windows["OwnerWelcomeWindow"].init_populate_table()
                 self.master.master.show_window("OwnerWelcomeWindow")
             else:
-                self.master.master.windows["VisitorHomeWindow"].set_uname(self.email_text.get()) 
-                self.master.master.windows["VisitorViewPropertyDetails"].set_uname(self.email_text.get()) 
+                self.master.master.windows["VisitorHomeWindow"].uname = data[0][0]
+                self.master.master.windows["VisitorViewPropertyDetails"].set_uname(data[0][0]) 
                 self.master.master.show_window("VisitorHomeWindow")
             self.clear_text_boxes()
         else:

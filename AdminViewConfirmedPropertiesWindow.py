@@ -158,7 +158,7 @@ class AdminViewConfirmedPropertiesWindow(Frame):
         if sort_attr == SEARCH_BY[0] or sort_attr == SEARCH_BY[1]:
             self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1) 
                                    FROM Property LEFT OUTER JOIN Visit
-                                   ON IDA=PropertyID
+                                   ON ID=PropertyID
                                    WHERE IsPublic=1 AND ApprovedBy IS NOT NULL
                                    GROUP BY Name
                                    ORDER BY {}""".format(PROP_ATTRS, sort_attr))

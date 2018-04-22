@@ -152,6 +152,7 @@ class VisitorViewPropertyDetails(Frame):
 
 	# insert rating into DB
 	def log_visit(self, rating):
+		print(self.uname)
 		if int(rating) not in [1, 2, 3, 4, 5]:
 			self.master.master.show_window("VisitorViewPropertyDetails")
 		else:

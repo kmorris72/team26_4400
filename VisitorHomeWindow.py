@@ -163,7 +163,7 @@ class VisitorHomeWindow(Frame):
 			sql = f"SELECT {ATTRS}, COUNT(Rating) AS cr, AVG(Rating) FROM Property LEFT OUTER JOIN \
 					Visit ON ID=PropertyID GROUP BY Name ORDER BY cr DESC"
 
-		return populate_table(self, sql)
+		return self.populate_table(sql)
 
 	# passed by LoginWindow
 	def set_uname(self, data):
