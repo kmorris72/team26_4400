@@ -1,7 +1,6 @@
 #NOTES:
 #Stuff to do:
 #1. Add the pass in of the property name
-#2. Create path for Back button
 
 from tkinter import *
 import tkinter.messagebox as messagebox
@@ -43,7 +42,7 @@ class PropertyDetailsWindow(Frame):
 		else:
 			prop_public = "No"
 		prop_type = (prop_type[0].upper() + prop_type[1:].lower())
-
+		prop_id = str(prop_id).zfill(5)
 		email_query = "SELECT Email FROM User WHERE Username=\"{}\"".format(prop_owner)
 		self.db_cursor.execute(email_query)
 		prop_owner_email = self.db_cursor.fetchall()[0][0]
@@ -127,7 +126,7 @@ class PropertyDetailsWindow(Frame):
 		self.backButton.grid(row=16,column=0, sticky=W+E,columnspan=2)
 
 	def back_event_handler(self):
-		root.destroy()
+		self.master.master.show_window("OtherOwnerPropertiesWindow")
 
 #my_gui = PropertyDetailsWindow(root)
 #root.mainloop()
