@@ -221,7 +221,7 @@ class OwnerViewOtherOwnersPropertiesWindow(Frame):
                 self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1) AS AvgRating
                                        FROM Property LEFT OUTER JOIN Visit
                                        ON ID=PropertyID
-                                       WHERE IsPublic=1 AND ApprovedBy IS NOT NULL
+                                       WHERE ApprovedBy IS NOT NULL
                                        GROUP BY Name
                                        HAVING AvgRating>={} AND AvgRating<={}""".format(PROP_ATTRS, lower_bound, upper_bound))
             except:
@@ -243,13 +243,12 @@ class OwnerViewOtherOwnersPropertiesWindow(Frame):
         data = self.db_cursor.fetchall()
         for i in range(len(data)):
             row = (data[i][0], data[i][1], data[i][2], data[i][3], data[i][4], data[i][5], "Yes" if data[i][6] == 1 else "No", "Yes" if data[i][7] == 1 else "No", data[i][8], data[i][9], data[i][10])
-            if data[i][10]!=Owner: #Still need to fix this part (carry over what owner the page is opened by.)
-              self.table.insert("", i, values=row)
+            self.table.insert("", i, values=row)
 
 
     def init_populate_table(self):
         self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1)
                                FROM Property LEFT OUTER JOIN Visit
                                ON ID=PropertyID
-                               WHERE IsPublic=1 AND ApprovedBy IS NOT NULL
+                               WHERE OWNER!= {} AND ApprovedBy IS NOT NULL
                                GROUP BY Name""".format(PROP_ATTRS))
