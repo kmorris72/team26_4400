@@ -12,6 +12,7 @@ SEARCH_BY = ["Username","Email","Number of Properties"]
 
 OWNER_ATTR="Username, Email"
 
+
 class AdminOwnerOverviewWindow(Frame):
     def __init__(self, master, db_cursor):
         Frame.__init__(self, master)
@@ -37,21 +38,6 @@ class AdminOwnerOverviewWindow(Frame):
         self.button_container = Frame(self)
         self.button_container.pack(padx=(50, 50), pady=(0, 30))
 
-        self.delete_back_button_container = Frame(self.button_container)
-        self.delete_back_button_container.pack(side=LEFT, padx=(0, 30))
-
-        self.delete_owner_button = Button(self.delete_back_button_container,
-                                         text="Delete Owner Account",
-                                         padx=10,
-                                         command=self.delete_owner_button_clicked_handler)
-        self.delete_owner_button.pack(pady=(0, 20))
-
-        self.back_button = Button(self.delete_back_button_container,
-                                  text="Back",
-                                  padx=10,
-                                  command=self.back_button_clicked_handler)
-        self.back_button.pack()
-
         self.sort_container = Frame(self.button_container)
         self.sort_container.pack(side=LEFT, padx=(50, 0))
 
@@ -73,7 +59,6 @@ class AdminOwnerOverviewWindow(Frame):
                                   padx=10,
                                   command=self.sort_button_click_handler)
         self.sort_button.pack(side=TOP)
-
 
         self.search_container = Frame(self.button_container)
         self.search_container.pack(side=LEFT)
@@ -122,6 +107,22 @@ class AdminOwnerOverviewWindow(Frame):
                                     padx=10,
                                     command=self.search_button_clicked_handler)
         self.search_button.pack(side=TOP, pady=(10, 0))
+
+        self.delete_back_button_container = Frame(self.button_container)
+        self.delete_back_button_container.pack(side=LEFT, padx=(0, 30))
+
+        self.delete_owner_button = Button(self.delete_back_button_container,
+                                         text="Delete Owner Account",
+                                         padx=10,
+                                         command=self.delete_owner_button_clicked_handler)
+        self.delete_owner_button.pack(pady=(0, 20))
+
+        self.back_button = Button(self.delete_back_button_container,
+                                  text="Back",
+                                  padx=10,
+                                  command=self.back_button_clicked_handler)
+        self.back_button.pack()
+
 
     def sort_button_click_handler(self):
         sort_attr = self.sort_by_var.get()

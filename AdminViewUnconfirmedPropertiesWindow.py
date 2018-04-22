@@ -60,7 +60,7 @@ class AdminViewUnconfirmedPropertiesWindow(Frame):
         self.tree['show'] = 'headings'
 
         self.button_container = Frame(self)
-        self.button_container.pack(pady=(0, 30))
+        self.button_container.pack(pady=(30, 30))
 
         self.sort_container = Frame(self.button_container)
         self.sort_container.pack(side=LEFT, padx=(50, 0))

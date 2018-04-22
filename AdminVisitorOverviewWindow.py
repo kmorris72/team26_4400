@@ -168,14 +168,14 @@ class AdminVisitorOverviewWindow(Frame):
     def sort_button_clicked_handler(self):
         sort_attr = self.sort_by_var.get()
         if sort_attr == COLUMN_NAMES[0] or sort_attr == COLUMN_NAMES[1]:
-            self.populate_table("""SELECT U.Username, Email, COUNT(*)
+            self.populate_table("""SELECT U.Username, Email, COUNT(Rating)
                                     FROM User AS U LEFT OUTER JOIN Visit as V
                                     ON U.Username=V.Username
                                     WHERE U.UserType="VISITOR"
                                     GROUP BY U.Username
                                     ORDER BY {}""".format(sort_attr))
         else:
-            self.populate_table("""SELECT U.Username, Email, COUNT(*) as VisitCount
+            self.populate_table("""SELECT U.Username, Email, COUNT(Rating) as VisitCount
                                     FROM User AS U LEFT OUTER JOIN Visit as V
                                     ON U.Username=V.Username
                                     WHERE U.UserType="VISITOR"
@@ -187,7 +187,7 @@ class AdminVisitorOverviewWindow(Frame):
         search_attr = self.search_by_var.get()
         if search_attr == COLUMN_NAMES[0] or search_attr == COLUMN_NAMES[1]:
             search_val = self.search_text.get()
-            self.populate_table("""SELECT U.Username, Email, COUNT(*)
+            self.populate_table("""SELECT U.Username, Email, COUNT(Rating)
                                    FROM User AS U LEFT OUTER JOIN Visit as V
                                    ON U.Username=V.Username
                                    WHERE U.UserType="VISITOR" AND U.{}=\"{}\"
@@ -196,7 +196,7 @@ class AdminVisitorOverviewWindow(Frame):
             try:
                 lower_bound = int(self.num_visits_range_low_text.get())
                 upper_bound = int(self.num_visits_range_high_text.get())
-                self.populate_table("""SELECT U.Username, Email, COUNT(*) as VisitCount
+                self.populate_table("""SELECT U.Username, Email, COUNT(Rating) as VisitCount
                                        FROM User AS U LEFT OUTER JOIN Visit as V
                                        ON U.Username=V.Username
                                        WHERE U.UserType="VISITOR"
@@ -220,7 +220,7 @@ class AdminVisitorOverviewWindow(Frame):
             
 
     def init_populate_table(self):
-        self.populate_table("""SELECT U.Username, Email, COUNT(*)
+        self.populate_table("""SELECT U.Username, Email, COUNT(Rating)
                                FROM User AS U LEFT OUTER JOIN Visit AS V
                                ON U.Username=V.Username
                                WHERE U.UserType="VISITOR"

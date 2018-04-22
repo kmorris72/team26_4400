@@ -274,6 +274,7 @@ class AdminManagePropertyWindow(Frame):
                                        WHERE ID={}""".format(self.property[0])
             self.db_cursor.execute(delete_property_query)
             messagebox.showinfo("Alert", "Property deleted.")
+            self.master.master.windows[self.previous_window].init_populate_table()
             self.master.master.show_window(self.previous_window)
         else:
             messagebox.showinfo("Alert", "Property not deleted.")
