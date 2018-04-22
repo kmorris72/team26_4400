@@ -251,7 +251,7 @@ class AdminManagePropertyWindow(Frame):
     def add_animal_button_clicked_handler(self):
         if messagebox.askyesno("Alert", "Are You Sure You Want to Add the Selected Animal to this Property?"):
             add_animal_query = """INSERT INTO Has
-                            VALUES ({}, "{}")""".format(self.property[0], self.animal_var.get())
+                                  VALUES ({}, "{}")""".format(self.property[0], self.animal_var.get())
             self.db_cursor.execute(add_animal_query)
             messagebox.showinfo("Alert", "Animal added.")
         else:
@@ -273,7 +273,7 @@ class AdminManagePropertyWindow(Frame):
             delete_property_query = """DELETE FROM Property
                                        WHERE ID={}""".format(self.property[0])
             self.db_cursor.execute(delete_property_query)
-            messagebox.showinfo("Alert", "Property deleted.")
+            messagebox.showinfo("Alert", "Property deleted.")N
             self.master.master.windows[self.previous_window].init_populate_table()
             self.master.master.show_window(self.previous_window)
         else:
@@ -284,8 +284,8 @@ class AdminManagePropertyWindow(Frame):
         if messagebox.askyesno("Alert", "Are You Sure You Want to Save the Changes to this Property?"):
             try:
                 make_prop_changes_query = """UPDATE Property
-                                                SET Name="{}", Street="{}", City="{}", Zip={}, Size={}, IsPublic={}, IsCommercial={}
-                                                WHERE ID={}""".format(self.name_entry.get(), self.address_entry.get(), self.city_entry.get(), int(self.zip_entry.get()), float(self.size_entry.get()), 1 if self.public_var.get() == "True" else 0, 1 if self.comm_var.get() == "True" else 0, self.property[0])
+                                             SET Name="{}", Street="{}", City="{}", Zip={}, Size={}, IsPublic={}, IsCommercial={}
+                                             WHERE ID={}""".format(self.name_entry.get(), self.address_entry.get(), self.city_entry.get(), int(self.zip_entry.get()), float(self.size_entry.get()), 1 if self.public_var.get() == "True" else 0, 1 if self.comm_var.get() == "True" else 0, self.property[0])
                 self.db_cursor.execute(make_prop_changes_query)
                 messagebox.showinfo("Alert", "Changes saved.")
             except:
@@ -341,7 +341,8 @@ class AdminManagePropertyWindow(Frame):
     def get_approved_animals_and_crops_from_db(self):
         animal_query = """SELECT Name
                           FROM FarmItem
-                          WHERE Type="ANIMAL" AND IsApproved=1"""
+                          WHERE Type="ANIMAL" AND IsApproved=1 AND NOT EXISTS(SELECT * FROM Has
+                                                                              WHERE PropertyID={} AND ItemName=Name)""".format(self.property[0])
         self.db_cursor.execute(animal_query)
         animals_result = self.db_cursor.fetchall()
 
@@ -350,17 +351,20 @@ class AdminManagePropertyWindow(Frame):
             self.add_animals_or_crops_container_add_animal.pack()
             crop_query = """SELECT Name
                             FROM FarmItem
-                            WHERE Type<>\"ANIMAL\" AND IsApproved=1"""
+                            WHERE Type<>\"ANIMAL\" AND IsApproved=1 AND NOT EXISTS(SELECT * FROM Has
+                                                                                   WHERE PropertyID={} AND ItemName=Name)""".format(self.property[0])
         elif self.property[8] == PROP_TYPES[1]:
             self.add_animals_or_crops_container_add_animal.pack_forget()
             crop_query = """SELECT Name
                             FROM FarmItem
-                            WHERE (Type=\"VEGETABLE\" OR Type=\"FLOWER\") AND IsApproved=1"""
+                            WHERE (Type=\"VEGETABLE\" OR Type=\"FLOWER\") AND IsApproved=1 AND NOT EXISTS(SELECT * FROM Has
+                                                                                                          WHERE PropertyID={} AND ItemName=Name)""".format(self.property[0])
         else:
             self.add_animals_or_crops_container_add_animal.pack_forget()
             crop_query = """SELECT Name
                             FROM FarmItem
-                            WHERE (Type=\"FRUIT\" OR Type=\"NUT\") AND IsApproved=1"""
+                            WHERE (Type=\"FRUIT\" OR Type=\"NUT\") AND IsApproved=1 AND NOT EXISTS(SELECT * FROM Has
+                                                                                                   WHERE PropertyID={} AND ItemName=Name)""".format(self.property[0])
 
         self.db_cursor.execute(crop_query)
         crops_result = self.db_cursor.fetchall()
