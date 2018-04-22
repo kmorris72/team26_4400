@@ -140,7 +140,7 @@ class AdminViewApprovedItemsWindow(Frame):
         if should_approve:
             item_data = (self.entername.get(), self.crop_choice_var.get().upper())
             approve_query = """INSERT INTO FarmItem
-                               VALUES (\"{}\", 0, \"{}\")""".format(item_data[0], item_data[1])
+                               VALUES (\"{}\", 1, \"{}\")""".format(item_data[0], item_data[1])
             self.db_cursor.execute(approve_query)
             self.tree.insert("", 0, values=item_data)
             messagebox.showinfo("Alert", "The Item Has Been Added.")
