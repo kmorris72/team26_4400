@@ -352,7 +352,7 @@ class OwnerRegistrationWindow(Frame):
             crop_menu = self.crop_drop_down["menu"]
             crop_menu.delete(0, END)
             get_crop_query = """SELECT Name FROM FarmItem
-                                WHERE Type<>\"Animal\" AND IsApproved=1"""
+                                WHERE Type<>\"ANIMAL\" AND IsApproved=1"""
             self.db_cursor.execute(get_crop_query)
             crop_list = list(self.db_cursor.fetchall())
             for crop in crop_list:
