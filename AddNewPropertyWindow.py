@@ -101,6 +101,8 @@ class AddNewPropertyWindow(Frame):
 
     def cancel_event_handler(self):
             self.master.master.show_window("OwnerWelcomeWindow")
+            self.clear_text_boxes_reset_drop_downs()
+
     def add_prop_event_handler(self):
         no_empty_text = True 
         for entry in (self.propertyName_entry, self.address_entry, self.city_entry, self.zip_entry, 
@@ -184,3 +186,15 @@ class AddNewPropertyWindow(Frame):
         self.db_cursor.execute(crop_insert_query)
         messagebox.showinfo("Success!", "Your property has been added!")
         self.master.master.show_window("OwnerWelcomeWindow")
+        self.clear_text_boxes_reset_drop_downs()
+    def clear_text_boxes_reset_drop_downs(self):
+        self.propertyName_entry.delete(0, END)
+        self.address_entry.delete(0, END)
+        self.city_entry.delete(0, END)
+        self.zip_entry.delete(0, END)
+        self.acres_entry.delete(0, END)
+        #self.prop_type_var.set(PROP_TYPES[0])
+        #self.animal.set(self.animal_entry["menu"].entrycget(0, "label"))
+        #self.crop.set(self.crop_entry["menu"].entrycget(0, "label"))
+        #self.public.set(PUB_COMM_VALUES[0])
+        #self.commercial.set(PUB_COMM_VALUES[1])
