@@ -255,7 +255,7 @@ class OwnerManagePropertyWindow(Frame):
                                    padx=10,
                                    height=2,width=12,
                                    command=self.req_crop_button_clicked_handler)
-        self.add_cr_button.pack(side=LEFT, pady=(5,10),padx=5)
+        self.req_cr_button.pack(side=LEFT, pady=(5,10),padx=5)
 
 
         self.delete_save_back_buttons_container = Frame(self)
@@ -321,6 +321,7 @@ class OwnerManagePropertyWindow(Frame):
                                        WHERE ID={}""".format(self.property[0])
             self.db_cursor.execute(delete_property_query)
             messagebox.showinfo("Alert", "Property deleted.")
+            self.master.master.windows[self.previous_window].init_populate_table()
             self.master.master.show_window(self.previous_window)
         else:
             messagebox.showinfo("Alert", "Property not deleted.")
@@ -335,7 +336,8 @@ class OwnerManagePropertyWindow(Frame):
                 self.db_cursor.execute(make_prop_changes_query)
                 messagebox.showinfo("Alert", "Changes saved.")
             except:
-                messagebox.showinfo("Alert", "No changes saved. Please make sure that you have entered numbers for Zip and Size.")
+                messagebox.showinfo("Alert", "No changes saved. Please make sure that you have entered numbers for Zip and " 
+                    + "Size. Also Please check to see if no field has been left blank.")
         else:
             messagebox.showinfo("Alert", "Changes not saved.")
 
