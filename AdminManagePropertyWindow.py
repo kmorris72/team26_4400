@@ -282,8 +282,8 @@ class AdminManagePropertyWindow(Frame):
         if messagebox.askyesno("Alert", "Are You Sure You Want to Save the Changes to this Property?"):
             try:
                 make_prop_changes_query = """UPDATE Property
-                                            SET Name="{}", Street="{}", City="{}". Zip={}, Size={}, IsPublic={}, IsApproved={}
-                                            WHERE ID={}""".format(self.name_entry.get(), self.address_entry.get(), self.city_entry.get(), int(self.zip_entry.get()), float(self.size_entry.get()), 1 if self.public_var.get() == "True" else 0, 1 if self.comm_var.get() == "True" else 0, self.property[0])
+                                             SET Name="{}", Street="{}", City="{}". Zip={}, Size={}, IsPublic={}, IsApproved={}
+                                             WHERE ID={}""".format(self.name_entry.get(), self.address_entry.get(), self.city_entry.get(), int(self.zip_entry.get()), float(self.size_entry.get()), 1 if self.public_var.get() == "True" else 0, 1 if self.comm_var.get() == "True" else 0, self.property[0])
                 self.db_cursor.execute(make_prop_changes_query)
                 messagebox.showinfo("Alert", "Changes saved.")
             except:

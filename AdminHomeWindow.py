@@ -77,7 +77,7 @@ class AdminHomeWindow(Frame):
 
     def visitors_list_button_clicked_handler(self):
         self.master.master.windows["AdminVisitorOverviewWindow"].init_populate_table()
-        self.master.master.show_window("AdminManagePropertyWindow")
+        self.master.master.show_window("AdminVisitorOverviewWindow")
 
 
     def owners_list_button_clicked_handler(self):
