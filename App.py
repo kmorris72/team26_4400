@@ -15,6 +15,7 @@ from VisitHistory import VisitHistory
 from VisitorHomeWindow import VisitorHomeWindow
 from VisitorViewPropertyDetails import VisitorViewPropertyDetails
 
+
 # All of the windows that make up the app.
 ALL_WINDOWS = (LoginWindow, OwnerRegistrationWindow, VisitorRegistrationWindow, AdminOwnerOverviewWindow, AdminViewConfirmedPropertiesWindow, AdminVisitorOverviewWindow, AdminViewPendingItemsWindow, AdminHomeWindow, AdminViewApprovedItemsWindow, AdminViewUnconfirmedPropertiesWindow, AdminManagePropertyWindow, VisitHistory, VisitorHomeWindow, VisitorViewPropertyDetails)
 
