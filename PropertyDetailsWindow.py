@@ -21,12 +21,10 @@ class PropertyDetailsWindow(Frame):
 
         self.current_property = ""
 
-    def populate():
+    def populate(self):
         prop_detail_query = "SELECT * FROM Property WHERE Name=\"{}\"".format(self.current_property)
         self.db_cursor.execute(prop_detail_query)
         prop_details = self.db_cursor.fetchall()
-        print(prop_details)
-        #print(prop_details[0])
         prop_id = prop_details[0][0]
         prop_size = prop_details[0][2]
         prop_commercial = prop_details[0][3]
