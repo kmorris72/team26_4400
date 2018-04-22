@@ -127,7 +127,7 @@ class AdminOwnerOverviewWindow(Frame):
     def sort_button_click_handler(self):
         sort_attr = self.sort_by_var.get()
         if sort_attr == SEARCH_BY[0] or sort_attr == SEARCH_BY[1]:
-            self.populate_table("""SELECT {}, Count(*)
+            self.populate_table("""SELECT {}, COUNT(ID)
                                    FROM User AS U LEFT OUTER JOIN Property AS P
                                    ON U.Username=P.Owner
                                    WHERE U.UserType="OWNER"
