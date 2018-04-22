@@ -33,10 +33,10 @@ class AdminManagePropertyWindow(Frame):
         self.label.pack()
 
         self.basic_info_container=Frame(self)
-        self.basic_info_container.pack()
+        self.basic_info_container.pack(padx=(50, 50), pady=(0, 30))
 
         self.basic_info_container_labels_part_1 = Frame(self.basic_info_container)
-        self.basic_info_container_labels_part_1.pack(side=LEFT)
+        self.basic_info_container_labels_part_1.pack(side=LEFT, padx=(0, 30))
 
         self.basic_info_container_labels_part_1_left_side=Frame(self.basic_info_container_labels_part_1)
         self.basic_info_container_labels_part_1_left_side.pack(side=LEFT)
@@ -44,22 +44,22 @@ class AdminManagePropertyWindow(Frame):
         self.name_label = Label(self.basic_info_container_labels_part_1_left_side,
                                text="Name:",
                                font="Times 12")
-        self.name_label.pack()
+        self.name_label.pack(pady=(0, 15))
 
         self.add_label = Label(self.basic_info_container_labels_part_1_left_side,
                            text="Address:",
                            font="Times 12")
-        self.add_label.pack()
+        self.add_label.pack(pady=(0, 15))
 
         self.cit_label = Label(self.basic_info_container_labels_part_1_left_side,
                            text="City:",
                            font="Times 12")
-        self.cit_label.pack()
+        self.cit_label.pack(pady=(0, 15))
 
         self.zip_label = Label(self.basic_info_container_labels_part_1_left_side,
                            text="Zip:",
                            font="Times 12")
-        self.zip_label.pack()
+        self.zip_label.pack(pady=(0, 15))
 
         self.siz_label = Label(self.basic_info_container_labels_part_1_left_side,
                            text="Size (acres):",
@@ -71,27 +71,27 @@ class AdminManagePropertyWindow(Frame):
 
         self.name_entry = Entry(self.basic_info_container_labels_part_1_right_side,
                                 font="Times 12",
-                                width=12)
-        self.name_entry.pack()
+                                width=25)
+        self.name_entry.pack(pady=(0, 10))
 
         self.address_entry = Entry(self.basic_info_container_labels_part_1_right_side,
                                 font="Times 12",
-                                width=12)
-        self.address_entry.pack()
+                                width=25)
+        self.address_entry.pack(pady=(0, 10))
 
         self.city_entry = Entry(self.basic_info_container_labels_part_1_right_side,
                                 font="Times 12",
-                                width=12)
-        self.city_entry.pack()
+                                width=25)
+        self.city_entry.pack(pady=(0, 10))
 
         self.zip_entry = Entry(self.basic_info_container_labels_part_1_right_side,
                                 font="Times 12",
-                                width=12)
-        self.zip_entry.pack()
+                                width=25)
+        self.zip_entry.pack(pady=(0, 10))
 
         self.size_entry = Entry(self.basic_info_container_labels_part_1_right_side,
                                 font="Times 12",
-                                width=12)
+                                width=25)
         self.size_entry.pack()
 
         self.basic_info_container_labels_part_2=Frame(self.basic_info_container)
@@ -103,17 +103,17 @@ class AdminManagePropertyWindow(Frame):
         self.typ_label = Label(self.basic_info_container_labels_part_2_left_side,
                            text="Type:",
                            font="Times 12")
-        self.typ_label.pack()
+        self.typ_label.pack(pady=(0, 21))
 
         self.pub_label = Label(self.basic_info_container_labels_part_2_left_side,
                            text="Public:",
                            font="Times 12")
-        self.pub_label.pack()
+        self.pub_label.pack(pady=(0, 21))
 
         self.com_label = Label(self.basic_info_container_labels_part_2_left_side,
                            text="Commercial:",
                            font="Times 12")
-        self.com_label.pack()
+        self.com_label.pack(pady=(0, 21))
 
         self.id_label = Label(self.basic_info_container_labels_part_2_left_side,
                            text="ID:",
@@ -126,19 +126,19 @@ class AdminManagePropertyWindow(Frame):
         self.prop_type_label = Label(self.basic_info_container_labels_part_2_right_side,
                            text="Farm",
                            font="Times 12")
-        self.prop_type_label.pack()
+        self.prop_type_label.pack(pady=(0, 20))
 
         self.public_var = StringVar(self.basic_info_container_labels_part_2_right_side)
         self.public_var.set(PUB_COMM_OPTIONS[1])
 
         self.public_drop_down = OptionMenu(self.basic_info_container_labels_part_2_right_side, self.public_var, *PUB_COMM_OPTIONS)
-        self.public_drop_down.pack()
+        self.public_drop_down.pack(pady=(0, 20))
 
         self.comm_var = StringVar(self.basic_info_container_labels_part_2_right_side)
         self.comm_var.set(PUB_COMM_OPTIONS[1])
 
         self.comm_drop_down = OptionMenu(self.basic_info_container_labels_part_2_right_side, self.comm_var, *PUB_COMM_OPTIONS)
-        self.comm_drop_down.pack()
+        self.comm_drop_down.pack(pady=(0, 20))
 
         self.id_num_label = Label(self.basic_info_container_labels_part_2_right_side,
                            text="ID:",
@@ -183,7 +183,7 @@ class AdminManagePropertyWindow(Frame):
         self.anim_label = Label(self.add_animals_or_crops_container_add_animal,
                            text="Add new Animal:",
                            font="Times 12")
-        self.anim_label.pack(side=LEFT, pady=(50,0))
+        self.anim_label.pack(side=LEFT, pady=(0,50))
 
         self.add_animals_or_crops_container_add_animal_select_side = Frame(self.add_animals_or_crops_container_add_animal)
         self.add_animals_or_crops_container_add_animal_select_side.pack(side=RIGHT)
@@ -206,7 +206,7 @@ class AdminManagePropertyWindow(Frame):
         self.anim_label = Label(self.add_animals_or_crops_container_add_crops,
                            text="Add new Crop:",
                            font="Times 12")
-        self.anim_label.pack(side=LEFT, pady=(50,0))
+        self.anim_label.pack(side=LEFT, pady=(0,50))
 
         self.add_animals_or_crops_container_add_crops_select_side=Frame(self.add_animals_or_crops_container_add_crops)
         self.add_animals_or_crops_container_add_crops_select_side.pack(side=RIGHT)
@@ -224,31 +224,28 @@ class AdminManagePropertyWindow(Frame):
         self.add_cr_button.pack(side=LEFT, pady=(5,10),padx=5)
 
         self.delete_save_back_buttons_container = Frame(self)
-        self.delete_save_back_buttons_container.pack()
+        self.delete_save_back_buttons_container.pack(pady=(30, 30))
+
+        self.save_button = Button(self.delete_save_back_buttons_container,
+                                   text="Save Changes\n(confirm property)",
+                                   padx=10,
+                                   height=3,width=15,
+                                   command=self.save_button_clicked_handler)
+        self.save_button.pack(pady=(0, 20))
+
+        self.back_button = Button(self.delete_save_back_buttons_container,
+                                   text="Back\n(Don't Save or Confirm)",
+                                   padx=10,
+                                   height=3,width=15,
+                                   command=self.back_button_clicked_handler)
+        self.back_button.pack(pady=(0, 20))
 
         self.delete_property_button = Button(self.delete_save_back_buttons_container,
                                    text="Delete Property",
                                    padx=10,
                                    width = 12,
                                    command=self.delete_property_button_clicked_handler)
-        self.delete_property_button.pack(side=LEFT, pady=(75,0))
-
-        self.delete_save_back_buttons_container_middle_section = Frame(self.delete_save_back_buttons_container)
-        self.delete_save_back_buttons_container_middle_section.pack(side=RIGHT)
-
-        self.save_button = Button(self.delete_save_back_buttons_container_middle_section,
-                                   text="Save Changes\n(confirm property)",
-                                   padx=10,
-                                   height=3,width=15,
-                                   command=self.save_button_clicked_handler)
-        self.save_button.pack()
-
-        self.back_button = Button(self.delete_save_back_buttons_container_middle_section,
-                                   text="Back\n(Don't Save or Confirm)",
-                                   padx=10,
-                                   height=3,width=15,
-                                   command=self.back_button_clicked_handler)
-        self.back_button.pack()
+        self.delete_property_button.pack()
 
 
     def add_animal_button_clicked_handler(self):
