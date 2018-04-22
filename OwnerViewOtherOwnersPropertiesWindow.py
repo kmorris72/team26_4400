@@ -232,6 +232,8 @@ class OwnerViewOtherOwnersPropertiesWindow(Frame):
 
     def manage_prop_button_clicked_handler(self):
         table_item = self.table.focus()
+        self.master.master.windows["PropertyDetailsWindow"].current_property = self.table.item(table_item)['text']
+        self.master.master.windows["PropertyDetailsWindow"].populate()
         property_id = self.table.item(table_item)["values"][8]
 
 
