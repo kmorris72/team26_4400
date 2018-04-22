@@ -164,12 +164,12 @@ class VisitorViewPropertyDetails(Frame):
 			self.cursor.execute(sql)
 			
 			# update VisitorHomeWindow table
-			sql = f"SELECT {ATTRS}, COUNT(Rating), AVG(Rating) FROM Property LEFT OUTER JOIN \
+			sql = f"SELECT {ATTRS}, COUNT(Rating), AVG(IFNULL(Rating,0)) FROM Property LEFT OUTER JOIN \
 				Visit ON ID=PropertyID GROUP BY Name"
 			self.master.master.windows["VisitorHomeWindow"].populate_table(sql)
 			
 			# update property details
-			sql = f"SELECT COUNT(Username), AVG(Rating) FROM Visit WHERE PropertyID='{self.d['ID']}' \
+			sql = f"SELECT COUNT(Username), AVG(IFNULL(Rating,0)) FROM Visit WHERE PropertyID='{self.d['ID']}' \
 					AND Username='{self.uname}'"
 			self.cursor.execute(sql)
 			data = self.cursor.fetchall()
@@ -192,12 +192,12 @@ class VisitorViewPropertyDetails(Frame):
 		sql = f"DELETE FROM Visit WHERE Username='{self.uname}' AND PropertyID='{self.d['ID']}'"
 		self.cursor.execute(sql)
 
-		sql = f"SELECT {ATTRS}, COUNT(Rating), AVG(Rating) FROM Property LEFT OUTER JOIN \
+		sql = f"SELECT {ATTRS}, COUNT(Rating), AVG(IFNULL(Rating,0)) FROM Property LEFT OUTER JOIN \
 				Visit ON ID=PropertyID GROUP BY Name"
 		self.master.master.windows["VisitorHomeWindow"].populate_table(sql)
 		
 		# update details screen
-		sql = f"SELECT COUNT(Username), AVG(Rating) FROM Visit WHERE PropertyID='{self.d['ID']}' \
+		sql = f"SELECT COUNT(Username), AVG(IFNULL(Rating,0)) FROM Visit WHERE PropertyID='{self.d['ID']}' \
 				AND Username='{self.uname}'"
 		self.cursor.execute(sql)
 		data = self.cursor.fetchall()

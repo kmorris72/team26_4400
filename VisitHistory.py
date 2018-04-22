@@ -47,7 +47,7 @@ class VisitHistory(Frame):
 		ID = data['values'][2]
 
 		# INNER JOIN would be fine too
-		sql = f"SELECT {ATTRS}, COUNT(Rating), AVG(Rating) FROM Property LEFT OUTER JOIN \
+		sql = f"SELECT {ATTRS}, COUNT(Rating), AVG(IFNULL(Rating,0)) FROM Property LEFT OUTER JOIN \
 				Visit ON ID='{ID}'"
 		self.cursor.execute(sql)
 		data = self.cursor.fetchone()

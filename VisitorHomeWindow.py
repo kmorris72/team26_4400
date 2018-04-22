@@ -105,7 +105,7 @@ class VisitorHomeWindow(Frame):
 									command=lambda: self.logout_go())
 		self.logout_button.pack(side=RIGHT)
 
-		self.sql = f"SELECT {ATTRS}, COUNT(Rating), AVG(Rating) FROM Property LEFT OUTER JOIN \
+		self.sql = f"SELECT {ATTRS}, COUNT(Rating), AVG(IFNULL(Rating,0)) FROM Property LEFT OUTER JOIN \
 				Visit ON ID=PropertyID GROUP BY Name"
 		self.populate_table(self.sql)
 
@@ -136,13 +136,13 @@ class VisitorHomeWindow(Frame):
 				if option_val == "Visits":
 					ov = "cr"
 
-				sql = f"SELECT {ATTRS}, COUNT(Rating) AS cr, AVG(Rating) AS ar FROM Property LEFT OUTER JOIN \
+				sql = f"SELECT {ATTRS}, COUNT(Rating) AS cr, AVG(IFNULL(Rating, 0)) AS ar FROM Property LEFT OUTER JOIN \
 						Visit ON ID=PropertyID GROUP BY Name HAVING ({ov} > '{bounds[0]}' AND \
 						{ov} < '{bounds[1]}') ORDER BY {ov} DESC"
 				
 			# Searching by any other DB attribute.
 			else:
-				sql = f"SELECT {ATTRS}, COUNT(Rating), AVG(Rating) FROM Property LEFT OUTER JOIN \
+				sql = f"SELECT {ATTRS}, COUNT(Rating), AVG(IFNULL(Rating,0)) FROM Property LEFT OUTER JOIN \
 						Visit ON ID=PropertyID WHERE {option_val} LIKE '%{search_val}%' \
 						GROUP BY Name ORDER BY {option_val}"
 
@@ -150,20 +150,20 @@ class VisitorHomeWindow(Frame):
 		# Not sorting by Visits or Avg. Rating and not searching anything.
 		# So, sorting by anything other than visits or avg rating.
 		elif option_val not in ["Visits", "Avg. Rating"]:
-			sql = f"SELECT {ATTRS}, COUNT(Rating), AVG(Rating) FROM Property LEFT OUTER JOIN \
+			sql = f"SELECT {ATTRS}, COUNT(Rating), AVG(IFNULL(Rating,0)) FROM Property LEFT OUTER JOIN \
 					Visit ON ID=PropertyID GROUP BY Name ORDER BY {option_val}"
 
 		# Sorting by Avg. Rating
 		elif option_val == "Avg. Rating":
-			sql = f"SELECT {ATTRS}, COUNT(Rating), AVG(Rating) AS ar FROM Property LEFT OUTER JOIN \
+			sql = f"SELECT {ATTRS}, COUNT(Rating), AVG(IFNULL(Rating,0)) AS ar FROM Property LEFT OUTER JOIN \
 					Visit ON ID=PropertyID GROUP BY Name ORDER BY ar DESC"
 		
 		# Sorting by Num Visits
 		else:
-			sql = f"SELECT {ATTRS}, COUNT(Rating) AS cr, AVG(Rating) FROM Property LEFT OUTER JOIN \
+			sql = f"SELECT {ATTRS}, COUNT(Rating) AS cr, AVG(IFNULL(Rating,0)) FROM Property LEFT OUTER JOIN \
 					Visit ON ID=PropertyID GROUP BY Name ORDER BY cr DESC"
 
-		return populate_table(self, sql)
+		return self.populate_table(sql)
 
 	# passed by LoginWindow
 	def set_uname(self, data):
