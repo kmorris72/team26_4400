@@ -32,6 +32,28 @@ class AdminVisitorOverviewWindow(Frame):
         self.button_container = Frame(self)
         self.button_container.pack(padx=(50, 50), pady=(0, 30))
 
+        self.sort_container = Frame(self.button_container)
+        self.sort_container.pack(side=LEFT, padx=(20, 0))
+
+        self.sort_by_label = Label(self.sort_container,
+                                   text="Sort By:",
+                                   font="Times 16")
+        self.sort_by_label.pack(side=TOP, pady=(0, 10))
+
+        self.sort_by_var = StringVar(self)
+        self.sort_by_var.set(COLUMN_NAMES[0])
+
+        self.sort_drop_down = OptionMenu(self.sort_container,
+                                         self.sort_by_var,
+                                         *COLUMN_NAMES)
+        self.sort_drop_down.pack(side=TOP, pady=(0, 10))
+
+        self.sort_button = Button(self.sort_container,
+                                  text="Sort Table by Chosen Attribute",
+                                  padx=10,
+                                  command=self.sort_button_clicked_handler)
+        self.sort_button.pack(side=TOP)
+
         self.delete_back_button_container = Frame(self.button_container)
         self.delete_back_button_container.pack(side=LEFT, padx=(0, 30))
 
@@ -142,12 +164,30 @@ class AdminVisitorOverviewWindow(Frame):
             self.search_text.pack_forget()
             self.num_visits_search_container.pack()
 
+
+    def sort_button_clicked_handler(self):
+        sort_attr = self.sort_by_var.get()
+        if sort_attr == COLUMN_NAMES[0] or sort_attr == COLUMN_NAMES[1]:
+            self.populate_table("""SELECT U.Username, Email, COUNT(*)
+                                    FROM User AS U LEFT OUTER JOIN Visit as V
+                                    ON U.Username=V.Username
+                                    WHERE U.UserType="VISITOR"
+                                    GROUP BY U.Username
+                                    ORDER BY {}""".format(sort_attr))
+        else:
+            self.populate_table("""SELECT U.Username, Email, COUNT(*) as VisitCount
+                                    FROM User AS U LEFT OUTER JOIN Visit as V
+                                    ON U.Username=V.Username
+                                    WHERE U.UserType="VISITOR"
+                                    GROUP BY U.Username
+                                    ORDER BY VisitCount""")
+
     
     def search_button_clicked_handler(self):
         search_attr = self.search_by_var.get()
         if search_attr == COLUMN_NAMES[0] or search_attr == COLUMN_NAMES[1]:
             search_val = self.search_text.get()
-            self.populate_table("""SELECT U.Username, Email, COUNT(*) 
+            self.populate_table("""SELECT U.Username, Email, COUNT(*)
                                    FROM User AS U LEFT OUTER JOIN Visit as V
                                    ON U.Username=V.Username
                                    WHERE U.UserType="VISITOR" AND U.{}=\"{}\"
