@@ -131,7 +131,8 @@ class OwnerViewOtherOwnersPropertiesWindow(Frame):
 
         self.manage_prop_button = Button(self.view_back_button_container,
                                          text="View Property Details",
-                                         padx=10)
+                                         padx=10,
+                                         command=self.manage_prop_button_clicked_handler)
         self.manage_prop_button.pack(side=TOP, padx=(0, 50))
 
         self.back_button = Button(self.view_back_button_container,
@@ -232,9 +233,11 @@ class OwnerViewOtherOwnersPropertiesWindow(Frame):
 
     def manage_prop_button_clicked_handler(self):
         table_item = self.table.focus()
-        self.master.master.windows["PropertyDetailsWindow"].current_property = self.table.item(table_item)['text']
+        prop_name = self.table.item(table_item)['values'][0]
+        self.master.master.windows["PropertyDetailsWindow"].current_property = prop_name
         self.master.master.windows["PropertyDetailsWindow"].populate()
         property_id = self.table.item(table_item)["values"][8]
+        self.master.master.show_window("PropertyDetailsWindow")
 
 
     def back_button_clicked_handler(self):
