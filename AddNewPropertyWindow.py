@@ -1,9 +1,3 @@
-#NOTES:
-#Stuff to do
-#1. Pass in of username
-#2. Path for Add New Property button. Where to go after property is added?
-#3. Path for cancel button
-
 from tkinter import *
 import tkinter.messagebox as messagebox
 import MySQLdb as sql
@@ -106,7 +100,7 @@ class AddNewPropertyWindow(Frame):
 			self.animal_entry.grid_forget()
 
 	def cancel_event_handler(self):
-			print(self.master.master.logged_in_user)
+			self.master.master.show_window("OwnerWelcomeWindow")
 	def add_prop_event_handler(self):
 		no_empty_text = True 
 		for entry in (self.propertyName_entry, self.address_entry, self.city_entry, self.zip_entry, 
@@ -176,7 +170,7 @@ class AddNewPropertyWindow(Frame):
 		prop_street = self.address_entry.get().strip()
 		prop_city = self.city_entry.get().strip()
 		prop_type = self.prop_type_var.get().upper()
-		username = self.master.parent.logged_in_user
+		username = self.master.master.logged_in_user
 		prop_insert_query = "INSERT INTO Property VALUES ({}, \"{}\", {}, {}, {}, \"{}\", \"{}\", {}, \"{}\", \"{}\", NULL)".format(prop_id, prop_name, prop_size, is_commercial, is_public, prop_street, prop_city, prop_zip, prop_type, username)
 		self.db_cursor.execute(prop_insert_query)
 
@@ -185,17 +179,11 @@ class AddNewPropertyWindow(Frame):
 			animal_name = self.animal.get()
 			animal_insert_query = "INSERT INTO Has VALUES ({}, \"{}\")".format(prop_id, animal_name)
 			self.db_cursor.execute(animal_insert_query)
-			if self.crop.get().strip() !="":
-				crop_name = self.crop.get()
-				crop_insert_query = "INSERT INTO Has VALUES ({}, \"{}\")".format(prop_id, crop_name)
-				self.db_cursor.execute(crop_insert_query)
-				messagebox.showinfo("Success!", "Your property has been added!")
-
-		else:
-			crop_name = self.crop.get()
-			crop_insert_query = "INSERT INTO Has VALUES ({}, \"{}\")".format(prop_id, crop_name)
-			self.db_cursor.execute(crop_insert_query)
-			messagebox.showinfo("Success!", "Your property has been added!")
+		crop_name = self.crop.get()
+		crop_insert_query = "INSERT INTO Has VALUES ({}, \"{}\")".format(prop_id, crop_name)
+		self.db_cursor.execute(crop_insert_query)
+		messagebox.showinfo("Success!", "Your property has been added!")
+		self.master.master.show_window("OwnerWelcomeWindow")
 
 
 #my_gui = AddNewPropertyWindow(root)
