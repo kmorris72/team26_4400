@@ -310,9 +310,9 @@ class OwnerManagePropertyWindow(Frame):
             req_crop_query = """INSERT INTO FarmItem
                                 VALUES ("{}", 0, "{}")""".format(self.reqcrop_entry.get(), self.reqcrop_var.get())
             self.db_cursor.execute(req_crop_query)
-            messagebox.showinfo("Alert", "Crop added.")
+            messagebox.showinfo("Alert", "Crop requested.")
         else:
-            messagebox.showinfo("Alert", "Crop not added.")
+            messagebox.showinfo("Alert", "Crop not requested.")
 
         
     def delete_property_button_clicked_handler(self):
@@ -330,11 +330,11 @@ class OwnerManagePropertyWindow(Frame):
     def save_button_clicked_handler(self):
         if messagebox.askyesno("Alert", "Are You Sure You Want to Save the Changes to this Property?"):
             try:
-              no_empty_text = True
-              for text_box in (self.name_entry.get(), self.address_entry.get(), self.city_entry.get(), self.zip_entry.get()):
-              if (text_box.get().strip() == ""):
-                messagebox.showinfo("Alert", "Please fill out all fields.")
-                no_empty_text = False
+                no_empty_text = True
+                for text_box in (self.name_entry.get(), self.address_entry.get(), self.city_entry.get(), self.zip_entry.get()):
+                  if (text_box.get().strip() == ""):
+                    messagebox.showinfo("Alert", "Please fill out all fields.")
+                    no_empty_text = False
 
 
               if (no_empty_text) :
