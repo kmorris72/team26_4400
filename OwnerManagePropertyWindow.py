@@ -316,12 +316,12 @@ class OwnerManagePropertyWindow(Frame):
             self.db_cursor.execute(req_crop_query);
             check = self.db_cursor.fetchall()
             if (check == 'true'):
-            req_crop_query = """INSERT IGNORE INTO FarmItem Has
-                                VALUES ("{}", 0, "{}")""".format(self.reqcrop_entry.get(), self.reqcrop_var.get())
-            self.db_cursor.execute(req_crop_query)
-            messagebox.showinfo("Alert", "Crop added.")
+              req_crop_query = """INSERT IGNORE INTO FarmItem Has
+                                  VALUES ("{}", 0, "{}")""".format(self.reqcrop_entry.get(), self.reqcrop_var.get())
+              self.db_cursor.execute(req_crop_query)
+              messagebox.showinfo("Alert", "Crop added.")
             else: 
-            messagebox.showinfo("Alert", "Crop has already been approved or is pending approval.")
+              messagebox.showinfo("Alert", "Crop has already been approved or is pending approval.")
         else:
             messagebox.showinfo("Alert", "Crop not added.")
 
@@ -410,7 +410,7 @@ class OwnerManagePropertyWindow(Frame):
         self.id_num_label.config(text=prop[0])
 
 
- def get_approved_animals_and_crops_from_db(self):
+    def get_approved_animals_and_crops_from_db(self):
         animal_query = """SELECT Name
                           FROM FarmItem
                           WHERE Type="ANIMAL" AND IsApproved=1 AND NOT EXISTS(SELECT * FROM Has
