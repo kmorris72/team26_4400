@@ -307,12 +307,23 @@ class OwnerManagePropertyWindow(Frame):
     
     def req_crop_button_clicked_handler(self):
         if messagebox.askyesno("Alert", "Are You Sure You Want to Request This Animal or Crop?"):
-            req_crop_query = """INSERT IGNORE INTO FarmItem
+            checkquery = """SELECT CASE WHEN EXISTS (
+                            SELECT 
+                            FROM FarmItem
+                            WHERE Name = \"{}\" AND Type = \"{}\")
+                            THEN 'true'
+                            ELSE 'false' END""".format(self.reqcrop_entry.get(), self.reqcrop_var.get())
+            self.db_cursor.execute(req_crop_query);
+            check = self.db_cursor.fetchall()
+            if (check == 'true'):
+            req_crop_query = """INSERT IGNORE INTO FarmItem Has
                                 VALUES ("{}", 0, "{}")""".format(self.reqcrop_entry.get(), self.reqcrop_var.get())
             self.db_cursor.execute(req_crop_query)
-            messagebox.showinfo("Alert", "Crop requested.")
+            messagebox.showinfo("Alert", "Crop added.")
+            else: 
+            messagebox.showinfo("Alert", "Crop has already been approved or is pending approval.")
         else:
-            messagebox.showinfo("Alert", "Crop not requested.")
+            messagebox.showinfo("Alert", "Crop not added.")
 
         
     def delete_property_button_clicked_handler(self):
