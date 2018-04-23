@@ -239,13 +239,13 @@ class OwnerViewOtherOwnersPropertiesWindow(Frame):
             self.populate_table("""SELECT {}, COUNT(*), ROUND(AVG(Rating), 1)
                                    FROM Property LEFT OUTER JOIN Visit
                                    ON ID=PropertyID
-                                   WHERE Owner!=\"{}\" AND ApprovedBy IS NOT NULL AND IsPublic={}
+                                   WHERE Owner!=\"{}\" AND ApprovedBy IS NOT NULL AND IsPublic=\"{}\"
                                    GROUP BY Name""".format(PROP_ATTRS, self.curr_owner, self.search_by_type_var.get().upper()))
         elif search_attr == SEARCH_BY[3]:
             try:
                 lower_bound = int(self.num_visits_range_low_text.get())
                 upper_bound = int(self.num_visits_range_high_text.get())
-                self.populate_table("""SELECT U.Username, Email, COUNT(Rating) as VisitCount
+                self.populate_table("""SELECT {}, COUNT(*), COUNT(Rating) as VisitCount
                                        FROM Property LEFT OUTER JOIN Visit
                                        ON ID=PropertyID
                                        WHERE Owner!=\"{}\" AND ApprovedBy IS NOT NULL
