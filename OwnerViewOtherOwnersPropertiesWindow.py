@@ -170,10 +170,12 @@ class OwnerViewOtherOwnersPropertiesWindow(Frame):
         if search_by_var == SEARCH_BY[2]:
             self.search_text.pack_forget()
             self.avg_rat_container.pack_forget()
+            self.num_visits_search_container.pack_forget()
             self.search_by_type_drop_down.pack()
         elif search_by_var == SEARCH_BY[4]:
             self.search_text.pack_forget()
             self.search_by_type_drop_down.pack_forget()
+            self.num_visits_search_container.pack_forget()
             self.avg_rat_container.pack()
         elif search_by_var==SEARCH_BY[3]:
             self.search_text.pack_forget()
@@ -182,6 +184,7 @@ class OwnerViewOtherOwnersPropertiesWindow(Frame):
         else:
             self.search_by_type_drop_down.pack_forget()
             self.avg_rat_container.pack_forget()
+            self.num_visits_search_container.pack_forget()
             self.search_text.pack()
 
 
@@ -237,7 +240,7 @@ class OwnerViewOtherOwnersPropertiesWindow(Frame):
                                    FROM Property LEFT OUTER JOIN Visit
                                    ON ID=PropertyID
                                    WHERE Owner!=\"{}\" AND ApprovedBy IS NOT NULL AND IsPublic={}
-                                   GROUP BY Name""".format(PROP_ATTRS, self.curr_owner, self.search_by_type_var.get()))
+                                   GROUP BY Name""".format(PROP_ATTRS, self.curr_owner, self.search_by_type_var.get().upper()))
         elif search_attr == SEARCH_BY[3]:
             try:
                 lower_bound = int(self.num_visits_range_low_text.get())
@@ -246,7 +249,7 @@ class OwnerViewOtherOwnersPropertiesWindow(Frame):
                                        FROM Property LEFT OUTER JOIN Visit
                                        ON ID=PropertyID
                                        WHERE Owner!=\"{}\" AND ApprovedBy IS NOT NULL
-                                       HAVING VisitCount>={} AND VisitCount<={}""".format(lower_bound, upper_bound))
+                                       HAVING VisitCount>={} AND VisitCount<={}""".format(PROP_ATTRS,self.curr_owner, lower_bound, upper_bound))
             except:
                 messagebox.showinfo("Alert", "Please Enter Numbers for the Bounds for Logged Visits.")
 
