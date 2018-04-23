@@ -244,13 +244,14 @@ class OwnerViewOtherOwnersPropertiesWindow(Frame):
                                    GROUP BY Name""".format(PROP_ATTRS, self.curr_owner, self.search_by_type_var.get().upper()))
         elif search_attr == SEARCH_BY[3]:
             try:
-                lower_bound = int(self.num_visits_range_low_text.get())
-                upper_bound = int(self.num_visits_range_high_text.get())
+                alower_bound = int(self.num_visits_range_low_text.get())
+                aupper_bound = int(self.num_visits_range_high_text.get())
                 self.populate_table("""SELECT {}, COUNT(*), COUNT(Rating) as VisitCount
                                        FROM Property LEFT OUTER JOIN Visit
                                        ON ID=PropertyID
                                        WHERE Owner!=\"{}\" AND ApprovedBy IS NOT NULL
-                                       HAVING VisitCount>={} AND VisitCount<={}""".format(PROP_ATTRS,self.curr_owner, lower_bound, upper_bound))
+                                       GROUP BY Name
+                                       HAVING VisitCount>={} AND VisitCount<={}""".format(PROP_ATTRS,self.curr_owner, alower_bound, aupper_bound))
             except:
                 messagebox.showinfo("Alert", "Please Enter Numbers for the Bounds for Logged Visits.")
 
@@ -258,14 +259,14 @@ class OwnerViewOtherOwnersPropertiesWindow(Frame):
 
         else:
             try:
-                lower_bound = float(self.avg_rat_low_end_text.get())
-                upper_bound = float(self.avg_rat_high_end_text.get())
+                blower_bound = float(self.avg_rat_low_end_text.get())
+                bupper_bound = float(self.avg_rat_high_end_text.get())
                 self.populate_table("""SELECT {}, ROUND(AVG(IFNULL(Rating,0)), 1) AS AvgRating
                                        FROM Property LEFT OUTER JOIN Visit
                                        ON ID=PropertyID
                                        WHERE Owner!=\"{}\" AND ApprovedBy IS NOT NULL
                                        GROUP BY Name
-                                       HAVING AvgRating>={} AND AvgRating<={}""".format(PROP_ATTRS, self.curr_owner, lower_bound, upper_bound))
+                                       HAVING AvgRating>={} AND AvgRating<={}""".format(PROP_ATTRS, self.curr_owner, blower_bound, bupper_bound))
             except:
                 messagebox.showinfo("Alert", "Please Enter Numbers for the Bounds for the Average Rating.")
 
