@@ -156,13 +156,12 @@ class VisitorViewPropertyDetails(Frame):
 			self.rate_label.grid_forget()
 			self.rate_entry.grid_forget()
 			self.log_button.grid_forget()
-			self.master.master.windows["VisitHistory"].populate()
-
 		
 			# insert rating
 			sql = f"INSERT INTO Visit VALUES ('{self.uname}', '{self.d['ID']}', '{datetime.datetime.now()}', '{rating}')"
-			self.cursor.execute(sql)
-			
+			self.cursor.execute(sql)	
+			self.master.master.windows["VisitHistory"].populate()
+
 			# update VisitorHomeWindow table
 			sql = f"SELECT {ATTRS}, COUNT(Rating), AVG(IFNULL(Rating,0)) FROM Property LEFT OUTER JOIN \
 				Visit ON ID=PropertyID GROUP BY Name"
@@ -187,10 +186,11 @@ class VisitorViewPropertyDetails(Frame):
 
 	def unlog_visit(self):
 		self.unlog_button.grid_forget()
-		self.master.master.windows["VisitHistory"].populate()
 		# remove visitor's rating
 		sql = f"DELETE FROM Visit WHERE Username='{self.uname}' AND PropertyID='{self.d['ID']}'"
 		self.cursor.execute(sql)
+
+		self.master.master.windows["VisitHistory"].populate()
 
 		# update visitor home window
 		sql = f"SELECT {ATTRS}, COUNT(Rating), AVG(IFNULL(Rating,0)) FROM Property LEFT OUTER JOIN \
