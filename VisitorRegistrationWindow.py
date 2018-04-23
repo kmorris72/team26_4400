@@ -93,12 +93,12 @@ class VisitorRegistrationWindow(Frame):
         
         email = self.email_text.get().strip()
         validemail = True;
-        if (regex.match(alphanumcheck, email) == None) {
+        if (regex.match(alphanumcheck, email) == None):
             messagebox.showinfo("Alert", "Please confirm that consists of alphanumeric characters, followed by an @"
             + "symbol, followed by alphanumeric characters, followed by a . symbol, followed "
             + "by alphanumeric characters.")
             validemail = False;
-        }
+        
 
 
         # Check that the email is not already in the database.
