@@ -4,14 +4,14 @@ import tkinter.messagebox as messagebox
 
 
 # Property types for searching.
-PROP_TYPES = ["FARM", "GARDEN", "ORCHARD"]
+PROP_TYPES = ["Yes","No"]
 
 # Column names for the data table.
 COLUMN_NAMES = ["Name", "Address", "City", "Zip", "Size", "Type", "Public", "Commercial",
                 "ID", "Visits", "Avg. Rating"]
 
 # The names of the columns that can be used as search terms.
-SEARCH_BY = ["Name", "City", "Public", "Visits", "Avg. Rating"]
+SEARCH_BY = ["Name", "City", "IsPublic", "Visits", "Avg. Rating"]
 
 # The attributes of a property as a string (used for queries).
 PROP_ATTRS = "Name, Street, City, Zip, Size, PropertyType, IsPublic, IsCommercial, ID"
@@ -98,6 +98,29 @@ class OwnerViewOtherOwnersPropertiesWindow(Frame):
                                                    self.search_by_type_var,
                                                    *PROP_TYPES)
 
+        self.num_visits_search_container = Frame(self.search_container_inner)
+
+        self.num_visits_low_label = Label(self.num_visits_search_container,
+                                        text="Lower End of Range:",
+                                        font="Times 16")
+        self.num_visits_low_label.pack()
+
+        self.num_visits_range_low_text = Entry(self.num_visits_search_container,
+                                             font="Times 16",
+                                             width=10)
+        self.num_visits_range_low_text.pack(pady=(0, 10))
+
+        self.num_visits_high_label = Label(self.num_visits_search_container,
+                                        text="Higher End of Range:",
+                                        font="Times 16")
+        self.num_visits_high_label.pack()
+
+        self.num_visits_range_high_text = Entry(self.num_visits_search_container,
+                                             font="Times 16",
+                                             width=10)
+        self.num_visits_range_high_text.pack(pady=(0, 10))
+
+
         self.avg_rat_container = Frame(self.search_container_inner)
 
         self.avg_rat_low_end_label = Label(self.avg_rat_container,
@@ -152,6 +175,10 @@ class OwnerViewOtherOwnersPropertiesWindow(Frame):
             self.search_text.pack_forget()
             self.search_by_type_drop_down.pack_forget()
             self.avg_rat_container.pack()
+        elif search_by_var==SEARCH_BY[3]:
+            self.search_text.pack_forget()
+            self.search_by_type_drop_down.pack_forget()
+            self.num_visits_search_container.pack()
         else:
             self.search_by_type_drop_down.pack_forget()
             self.avg_rat_container.pack_forget()
@@ -203,20 +230,28 @@ class OwnerViewOtherOwnersPropertiesWindow(Frame):
             self.populate_table("""SELECT {}, COUNT(*), ROUND(AVG(Rating), 1)
                                    FROM Property LEFT OUTER JOIN Visit
                                    ON ID=PropertyID
-                                   WHERE Owner!=\"{}\" AND ApprovedBy IS NOT NULL AND {}=\"{}\"
-                                   GROUP BY Name""".format(PROP_ATTRS, self.curr_owner, search_attr, search_val))
+                                   WHERE Owner!=\"{}\" AND ApprovedBy IS NOT NULL
+                                   GROUP BY Name""".format(PROP_ATTRS, self.curr_owner, search_val))
         elif search_attr == SEARCH_BY[2]:
             self.populate_table("""SELECT {}, COUNT(*), ROUND(AVG(Rating), 1)
                                    FROM Property LEFT OUTER JOIN Visit
                                    ON ID=PropertyID
-                                   WHERE Owner!=\"{}\" AND ApprovedBy IS NOT NULL AND PropertyType=\"{}\"
-                                   GROUP BY Name""".format(PROP_ATTRS, self.curr_owner, search_val))
+                                   WHERE Owner!=\"{}\" AND ApprovedBy IS NOT NULL AND IsPublic={}
+                                   GROUP BY Name""".format(PROP_ATTRS, self.curr_owner, self.search_by_type_var.get()))
         elif search_attr == SEARCH_BY[3]:
-            self.populate_table("""SELECT {}, COUNT(*) as TotalCount, ROUND(AVG(Rating), 1) AS AvgRating
-                                   FROM Property LEFT OUTER JOIN Visit
-                                   ON ID=PropertyID
-                                   WHERE Owner!=\"{}\" AND ApprovedBy IS NOT NULL AND ApprovedBy=\"{}\"
-                                   GROUP BY Name""".format(PROP_ATTRS, self.curr_owner, search_val))
+            try:
+                lower_bound = int(self.num_visits_range_low_text.get())
+                upper_bound = int(self.num_visits_range_high_text.get())
+                self.populate_table("""SELECT U.Username, Email, COUNT(Rating) as VisitCount
+                                       FROM Property LEFT OUTER JOIN Visit
+                                       ON ID=PropertyID
+                                       WHERE Owner!=\"{}\" AND ApprovedBy IS NOT NULL
+                                       HAVING VisitCount>={} AND VisitCount<={}""".format(lower_bound, upper_bound))
+            except:
+                messagebox.showinfo("Alert", "Please Enter Numbers for the Bounds for Logged Visits.")
+
+
+
         else:
             try:
                 lower_bound = float(self.avg_rat_low_end_text.get())
