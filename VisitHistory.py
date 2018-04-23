@@ -78,6 +78,7 @@ class VisitHistory(Frame):
 		app_data['Items'] = [x[0] for x in data]
 
 		self.master.master.windows["VisitorViewPropertyDetails"].populate(app_data)
+		self.master.master.windows["VisitorViewPropertyDetails"].clean()
 		self.master.master.windows["VisitorViewPropertyDetails"].which_screen()
 		self.master.master.windows["VisitorViewPropertyDetails"].from_hist = 1
 		self.master.master.show_window("VisitorViewPropertyDetails")
@@ -104,6 +105,7 @@ class VisitHistory(Frame):
 		# Important! Query return vals should be 
 		# in the same order as the columns.
 		data = self.cursor.fetchall()
+		print(data)
 		# put our tuple results in the widget. 
 		for tup in data:
 
