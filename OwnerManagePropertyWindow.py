@@ -337,19 +337,19 @@ class OwnerManagePropertyWindow(Frame):
                     no_empty_text = False
 
 
-              if (no_empty_text) :
-                make_prop_changes_query = """UPDATE Property
+                if (no_empty_text):
+                  make_prop_changes_query = """UPDATE Property
                                                 SET Name="{}", Street="{}", City="{}", Zip={}, Size={}, IsPublic={}, IsCommercial={}
                                                 WHERE ID={}""".format(self.name_entry.get(), self.address_entry.get(), self.city_entry.get(), int(self.zip_entry.get()), float(self.size_entry.get()), 1 if self.public_var.get() == "True" else 0, 1 if self.comm_var.get() == "True" else 0, self.property[0])
-                self.db_cursor.execute(make_prop_changes_query)
-                messagebox.showinfo("Alert", "Changes saved.")
-                make_prop_changes_query = """UPDATE Property
+                  self.db_cursor.execute(make_prop_changes_query)
+                  messagebox.showinfo("Alert", "Changes saved.")
+                  make_prop_changes_query = """UPDATE Property
                                                 SET Name="{}", Street="{}", City="{}", Zip={}, Size={}, IsPublic={}, IsCommercial={}
                                                 WHERE ID={}""".format(self.name_entry.get(), self.address_entry.get(), self.city_entry.get(), int(self.zip_entry.get()), float(self.size_entry.get()), 1 if self.public_var.get() == "True" else 0, 1 if self.comm_var.get() == "True" else 0, self.property[0])
-                self.db_cursor.execute(make_prop_changes_query)
-                messagebox.showinfo("Alert", "Changes saved.")
-            except:
-                messagebox.showinfo("Alert", "No changes saved. Please make sure that you have entered numbers for Zip and " 
+                  self.db_cursor.execute(make_prop_changes_query)
+                  messagebox.showinfo("Alert", "Changes saved.")
+              except:
+                  messagebox.showinfo("Alert", "No changes saved. Please make sure that you have entered numbers for Zip and " 
                     + "Size. Also Please check to see if no field has been left blank.")
         else:
             messagebox.showinfo("Alert", "Changes not saved.")
