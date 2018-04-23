@@ -185,6 +185,7 @@ class AddNewPropertyWindow(Frame):
         crop_insert_query = "INSERT INTO Has VALUES ({}, \"{}\")".format(prop_id, crop_name)
         self.db_cursor.execute(crop_insert_query)
         messagebox.showinfo("Success!", "Your property has been added!")
+        self.master.master.windows["OwnerWelcomeWindow"].init_populate_table()
         self.master.master.show_window("OwnerWelcomeWindow")
         self.clear_text_boxes_reset_drop_downs()
     def clear_text_boxes_reset_drop_downs(self):
