@@ -90,7 +90,7 @@ class VisitHistory(Frame):
 
 	def populate(self):
 		sql = f"SELECT Name, VisitDate, Rating, ID FROM Visit INNER JOIN Property ON PropertyID=ID \
-				WHERE Username=\"{self.uname}\" GROUP BY Name"
+				WHERE Username='{self.uname}' GROUP BY Name"
 		# remove all info currently in the table
 		self.tree.delete(*self.tree.get_children())
 
