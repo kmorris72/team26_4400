@@ -259,7 +259,7 @@ class OwnerViewOtherOwnersPropertiesWindow(Frame):
             try:
                 lower_bound = float(self.avg_rat_low_end_text.get())
                 upper_bound = float(self.avg_rat_high_end_text.get())
-                self.populate_table("""SELECT {}, ROUND(AVG(Rating), 1) AS AvgRating
+                self.populate_table("""SELECT {}, ROUND(AVG(IFNULL(Rating,0)), 1) AS AvgRating
                                        FROM Property LEFT OUTER JOIN Visit
                                        ON ID=PropertyID
                                        WHERE Owner!=\"{}\" AND ApprovedBy IS NOT NULL
