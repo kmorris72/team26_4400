@@ -399,10 +399,11 @@ class OwnerManagePropertyWindow(Frame):
         self.id_num_label.config(text=prop[0])
 
 
-    def get_approved_animals_and_crops_from_db(self):
+ def get_approved_animals_and_crops_from_db(self):
         animal_query = """SELECT Name
                           FROM FarmItem
-                          WHERE Type="ANIMAL" AND IsApproved=1"""
+                          WHERE Type="ANIMAL" AND IsApproved=1 AND NOT EXISTS(SELECT * FROM Has
+                                                                                   WHERE PropertyID={} AND ItemName=Name)""".format(self.property[0])
         self.db_cursor.execute(animal_query)
         animals_result = self.db_cursor.fetchall()
 
@@ -411,17 +412,20 @@ class OwnerManagePropertyWindow(Frame):
             self.add_animals_or_crops_container_add_animal.pack()
             crop_query = """SELECT Name
                             FROM FarmItem
-                            WHERE Type<>\"ANIMAL\" AND IsApproved=1"""
+                            WHERE Type<>\"ANIMAL\" AND IsApproved=1 AND NOT EXISTS(SELECT * FROM Has
+                                                                                   WHERE PropertyID={} AND ItemName=Name)""".format(self.property[0])
         elif self.property[8] == PROP_TYPES[1]:
             self.add_animals_or_crops_container_add_animal.pack_forget()
             crop_query = """SELECT Name
                             FROM FarmItem
-                            WHERE (Type=\"VEGETABLE\" OR Type=\"FLOWER\") AND IsApproved=1"""
+                            WHERE (Type=\"VEGETABLE\" OR Type=\"FLOWER\") AND IsApproved=1 AND NOT EXISTS(SELECT * FROM Has
+                                                                                   WHERE PropertyID={} AND ItemName=Name)""".format(self.property[0])
         else:
             self.add_animals_or_crops_container_add_animal.pack_forget()
             crop_query = """SELECT Name
                             FROM FarmItem
-                            WHERE (Type=\"FRUIT\" OR Type=\"NUT\") AND IsApproved=1"""
+                            WHERE (Type=\"FRUIT\" OR Type=\"NUT\") AND IsApproved=1 AND NOT EXISTS(SELECT * FROM Has
+                                                                                   WHERE PropertyID={} AND ItemName=Name)""".format(self.property[0])
 
         self.db_cursor.execute(crop_query)
         crops_result = self.db_cursor.fetchall()
