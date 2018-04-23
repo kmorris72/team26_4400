@@ -261,7 +261,7 @@ class OwnerViewOtherOwnersPropertiesWindow(Frame):
             try:
                 blower_bound = float(self.avg_rat_low_end_text.get())
                 bupper_bound = float(self.avg_rat_high_end_text.get())
-                self.populate_table("""SELECT {}, ROUND(AVG(IFNULL(Rating,0)), 1) AS AvgRating
+                self.populate_table("""SELECT {}, ROUND(AVG(IFNULL(Rating,0)), 1) AS AvgRating,  COUNT(Rating) AS Visits
                                        FROM Property LEFT OUTER JOIN Visit
                                        ON ID=PropertyID
                                        WHERE Owner!=\"{}\" AND ApprovedBy IS NOT NULL
