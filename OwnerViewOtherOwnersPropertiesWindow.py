@@ -179,6 +179,7 @@ class OwnerViewOtherOwnersPropertiesWindow(Frame):
             self.avg_rat_container.pack()
         elif search_by_var==SEARCH_BY[3]:
             self.search_text.pack_forget()
+            self.avg_rat_container.pack_forget()
             self.search_by_type_drop_down.pack_forget()
             self.num_visits_search_container.pack()
         else:
